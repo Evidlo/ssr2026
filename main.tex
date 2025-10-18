@@ -2,9 +2,13 @@
 
 \documentclass[pdflatex,twocolumn,sn-mathphys-num]{sn-jnl}
 
-\usepackage[title]{appendix}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{algpseudocode}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{amsthm}
+\usepackage[title]{appendix}
+\usepackage{booktabs}
 \usepackage{bm}
 %% \usepackage{dblfloatfix}
 \usepackage{graphicx}
@@ -12,22 +16,20 @@
 \usepackage{harpoon}
 \usepackage[utf8x]{inputenc}
 \usepackage{layout}
+\usepackage{listings}
+\usepackage{manyfoot}
 \usepackage{makecell}
 \usepackage{mathrsfs}
 \usepackage{multirow}
-\usepackage{xcolor}
-\usepackage{textcomp}
-\usepackage{manyfoot}
-\usepackage{booktabs}
-\usepackage{algorithm}
-\usepackage{algorithmicx}
-\usepackage{algpseudocode}
-\usepackage{listings}
+\usepackage{subcaption}
 \usepackage{svg}
+\usepackage{textcomp}
+\usepackage{xcolor}
 
 %% ================= MACROS ======================
 
 \newcommand{\vc}[1]{\overrightharp{#1}}
+\newcommand{\dif}{\mathop{}\!\mathrm{d}}
 
 
 
@@ -100,6 +102,14 @@ The Narrow Field Imager (NFI) observes the inner exosphere at high resolution on
 
   Together, these cameras are capable of measuring both the fast-evolving dynamics of the inner exosphere and the global distribution of hydrogen along with the interplanetary background Lyman-$\alpha$ signal (discussed in the next section).  Figure \ref{fig:fov} shows the field of view (FOV) of the cameras relative to the inner exosphere boundary and outer exospheric limit.
 
+
+\begin{figure}[h]
+  \includegraphics[width=1\linewidth]{figures/orbit}
+  \caption{6 month Carruthers orbit around L1.  Not to scale.}
+  %% \footnotetext{Earth/Moon image courtesy of https://de.wikipedia.org/wiki/Benutzer:Master_Uegly}
+  \label{fig:orbit_details}
+\end{figure}
+
 \begin{figure}[h]
   \center
   \includegraphics[width=.6\linewidth]{figures/fov}
@@ -107,13 +117,6 @@ The Narrow Field Imager (NFI) observes the inner exosphere at high resolution on
   \label{fig:fov}
 \end{figure}
 
-
-\begin{figure}[h]
-  \includegraphics[width=.9\linewidth]{figures/orbit}
-  \caption{6 month Carruthers orbit around L1.  Not to scale.}
-  %% \footnotetext{Earth/Moon image courtesy of https://de.wikipedia.org/wiki/Benutzer:Master_Uegly}
-  \label{fig:orbit_details}
-\end{figure}
 
 %% =============== EMISSION MODEL =================
 
@@ -129,7 +132,8 @@ This is known as an emission model and is a central component of tomographic ret
 
   \begin{equation*}
     I_{\text{exo},t} = \frac{g_t}{4 \pi} \phi (\beta)
-    \int_S \bm{a}_t (\vc{s}) \bm{\rho}_t (\vc{s}) dif s
+    \int_S \bm{a}_t (\vc{s}) \bm{\rho}_t (\vc{s}) \dif s
+    \text{  (phot/s/cm²/sr) }
   \end{equation*}
 
     %% #gt([(phot/s/cm²/sr)])
@@ -163,7 +167,44 @@ This is known as an emission model and is a central component of tomographic ret
   \label{tab:emission_units}
 \end{table}
 
+%% ======================== PREPROCESSING ======================
+
 \section{Preprocessing}
+
+Raw sensor measurements must be calibrated to column density (atoms/cm²) before they can be ingested by the retrieval algorithm
+  The details of calibration are out of scope of this manuscript, but can be found in (FIXME: cite Alex calibration paper.)
+
+  Calibration reverses many of the terms of the emission model given in the previous section and additional distortion introduced by the instrument, resulting in an expression that is independent of any instrument parameters or solar conditions
+
+    \begin{equation}
+        y_{t j} \approx \int_{S_{t j}} \bm{a}_t (\vc{s}) \bm{\rho}_t (\vc{s}) \dif s \text{  (atom/cm²)}
+    \end{equation}
+
+  where LOS $S_{t j}$ is annotated with indices $t j$ to emphasize time and pixel dependence.
+
+    As mentioned previously, some LOS contain Lyman-$\alpha$ signals which are unknown or violate the emission model assumptions and must be marked so they are ignored during retrieval.  These include the Moon, stars, optically thick exosphere, and Earth shadow, shown in Figure \ref{fig:masks} \cite{zoennchen_old}.
+
+\begin{figure*}[t!]
+  \centering
+  \begin{subfigure}[t]{0.3\textwidth}
+    \centering
+    \includegraphics[height=1.8in]{figures/mask_moon}
+    \caption{Moon mask}
+  \end{subfigure}%
+  \begin{subfigure}[t]{0.3\textwidth}
+    \centering
+    \includegraphics[height=1.8in]{figures/mask_stars}
+    \caption{Stellar mask}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.3\textwidth}
+    \centering
+    \includegraphics[height=1.8in]{figures/mask_thick}
+    \caption{Optically thick exosphere and shadow mask}
+  \end{subfigure}
+  \caption{Extraneous sources of Lyman-$\alpha$ that must be masked, relative to NFI/WFI camera FOV}
+  \label{fig:masks}
+\end{figure*}
+
 
 \section{Inverse Problem Formulation and Density Model}
 
