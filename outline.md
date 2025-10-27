@@ -51,20 +51,22 @@
   - grid settings
   - two week observation window selected to allow sufficient measurement diversity while minimizing error
   
-## operational algorithm
+## Uncertainty Quantification
+
+- [x] montecarlo simulation with N=100 ensemble 
+- [x] too expensive to do at full retrieval cadence)
+  - previous determined uncertainty will be held until next estimate is scheduled
+  - [x] parametric bootstrapping
+  
+## Data Products
 
 - sliding 2 week window for L=3
   - retrieval centered in window
   - storm time exclusion conditions for measurements (Kp/DST index?)
 - sliding 6 hour window for L=0
   - no storm time exclusion conditions
+- uncertainty estimate
 
-## Uncertainty Quantification
-
-- montecarlo simulation with N=100 ensemble 
-- too expensive to do at full retrieval cadence)
-  - previous determined uncertainty will be held until next estimate is scheduled
-  
 ## Results and Discussion
 
 - retrievals with given dataset
