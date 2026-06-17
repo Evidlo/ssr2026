@@ -23,8 +23,8 @@
 \usepackage{mathrsfs}
 \usepackage{multirow}
 \usepackage{subcaption}
-\usepackage{svg}
 \usepackage{textcomp}
+\usepackage[normalem]{ulem}
 \usepackage{xcolor}
 
 
@@ -33,6 +33,9 @@
 \newcommand{\vc}[1]{\overrightharp{#1}}
 \newcommand{\bb}[1]{\mathbb{#1}}
 \newcommand{\dif}{\mathop{}\!\mathrm{d}}
+\newcommand{\gt}[1]{\textcolor{green}{#1}}
+\newcommand{\rt}[1]{\textcolor{red}{#1}}
+\newcommand{\st}[1]{{\color{red}\sout{#1}}}
 
 
 
@@ -51,7 +54,15 @@
 \affil{\orgdiv{Electrical and Computer Engineering}, \orgname{University of Illinois Urbana-Champaign}, \orgaddress{\street{306 N Wright}, \city{Champaign}, \postcode{61820}, \state{IL}, \country{United States}}}
 
 
-\abstract{The abstract serves both as a general introduction to the topic and as a brief, non-technical summary of the main results and their implications. Authors are advised to check the author instructions for the journal they are submitting to for word limits and if structural elements like subheadings, citations, or equations are permitted.}
+\abstract{
+Knowledge of the outermost layer of Earth's atmosphere, known as the exosphere, is important for understanding processes like plasmaspheric refilling and ring current recovery after geomagnetic storms.
+The Carruthers Geocorona Observatory, launched in September 2025, represents the first mission dedicated to studying this region of our planet's atmosphere with continuous, wide-field observations of scattered Lyman-$\alpha$ H emission from a distant vantage at the Earth-Sun L1 Lagrange point.  By iteratively fitting a to these detected Lyman-$\alpha$ emissions, it is possible to computationally recover a plausible global H density distribution through tomographic retrieval.
+In this work, we present a flexible 3D parametric retrieval model which improves upon previous approaches by replacing rigid radial density decay assumptions and density priors with a truncated spherical harmonic basis and adaptible cubic b-splines, performing strongly in geomagnetically quiet conditions.
+
+
+
+
+}
 
 \keywords{remote sensing, tomography, spacecraft, inverse problems, exosphere, geocorona}
 
@@ -65,22 +76,55 @@
 
 \section{Introduction}\label{intro}
 
-TO BE FILLED BY LARA
+Knowledge of the structure of the Earth's exosphere, the outermost layer of atmosphere, is critical for understanding several important atmospheric processes like plasmaspheric refilling and ring current recovery following geomagnetic storms (FIXME: cite).  Additionally, the exosphere serves as the pathway for permanent escape to space of atomic hydrogen (H), the main constituent of the exosphere and a key driver of long-term water loss on Earth.  The Carruthers Geocorona Observatory represents the first spacecraft dedicated to studying this region of our planet's atmosphere, making continuous wide-field observations of scattered Lyman-$\alpha$ H emission from a distant vantage at spatial and temporal resolutions exceeding any previous study.
+Lyman-$\alpha$ is ideal as a target to study the exosphere, as these photons are excited by resonant scattering from atmospheric H and produce very bright emissions that can only be observed by spacecraft.
+
+
+By mathematically modelling the propagation of solar photons through the exosphere, a 3D reconstruction of the exosphere which is consistent with 2D images produced by the Carruthers cameras can be obtained through a tomographic retrieval process.
+
+This paper focuses on the region of the exosphere where H density is low enough that most solar photons scatter once before entering the detector, known as the optically thin regime.  Details of the reconstruction process for the optically thick regime can be found in (FIXME: citation)
+
+  Knowledge of the H density distribution in the exosphere has advanced primarily due to spaceborne (UV) sensing.  While direct measurement is possible with mass spectrometers (e.g. sounding rockets), the sheer size of the exosphere makes this approach impractical.  Ground-based remote sensing has been hampered by the fact that O₂ at lower altitudes is opaque to (UV) and by limited measurement angles due to a fixed sensor platform.
+  However, attempts have been made to exploit vantage evolution of rotating Earth's surface \cite{balmer2}.
+  Visible H emission (Balmer-$\alpha$ line) from resonant fluorescence has been observed on the ground for decades \cite{balmer1}, but the signal is very dim and no reliable density distributions have been derived due to limited data constraints from ground-based sensors.  To date, no reliable retrievals have been derived from these measurements.
+
+  Lyman-$\alpha$ is ideal as a target to study the exosphere, as these are photons excited by resonant scattering from the ground state and produce very bright emissions.
+  Lyman-$\alpha$ studies of the exosphere have occurred sporadically for decades, but usually as opportunistic measurements or as a secondary science goal.
+ Figure \ref{fig:previous_mission} provides an overview of key historical observations with accompanying descriptions given below.
+
+  An early exospheric measurement came from OGO-5 in 1969 which detected H atoms out to 7 Re and proved the existence of a geotail (a Sun-Earth aligned protrusion) and Lyman-$\alpha$ background from (IPH) \cite{ogo5} \cite{baliukin}.
+  This was followed by Apollo 16 in 1972 which carried a photocathode-based UV imager to the Lunar surface that serves as the basis for modern UV cameras. The Apollo 16 experiment obtained a single image, the first ever wide-field exospheric measurement \cite{apollo2} \cite{apollo}.
+  Much later Galileo performed an Earth flyby during a gravity assist in 1991 towards Jupiter, capturing a single composite image which indicated an exospheric radial extent beyond that found by Apollo.
+  A few years later in 1996, the SOHO spacecraft with its SWAN hydrogen absorption cell \cite{soho_swan} launched towards Lagrange point L1 (ideal for observing the exosphere globally).  SWAN captured full-sky Lyman-$\alpha$ images, with some high-resolution scans directed towards the Earth, finding the presence of exospheric H atoms out to 100 Re \cite{baliukin}.
+  From 2000 to 2005, the IMAGE spacecraft and GEO instrument with three scanning photometers slowly scanned over different altitudes, detecting the presence of a geotail.  The spacecraft additionally found significant temporal variation in measured flux, which was not well explained by solar variation, suggesting complicated exosphere dynamics \cite{ostgaard}.
+  From 2001 to 2025, the TIMED spacecraft and GUVI instrument launched and began long-term UV imaging through the limb near the exobase, finding an inverse correlation between H density at the exobase and solar activity \cite{timed_guvi2}.
+  In 2015, the PROCYON spacecraft and LAICA instrument captured a single wide-field from 2350 Re, with studies reporting agreement between the retrieved H density distribution and predictions from radiation pressure theory \cite{procyon_laica}.
+  In the same year, the dual TWINS spacecraft launched and began acquiring composite Lyman-$\alpha$ measurements, identifying storm-time variations in the exosphere with radial enhancements of H density propagating outwards \cite{gonzalo_storm} \cite{zoennchen2011}.
+
+\begin{figure*}[h!]
+  \centering
+  \includegraphics[height=2.7in]{figures/previous_missions}
+  \caption{Past, current and future observations of exospheric hydrogen at Lyman-$\alpha$.  Carruthers is the only mission dedicated to longterm exospheric study from a distant vantage.  Not representative of actual spacecraft location}
+  \label{fig:previous_mission}
+\end{figure*}
+
+  Of these missions, only TWINS and TIMED have observed the exosphere over multi-year timescales, but their low-altitude observations and measurement gaps limit their utility in understanding global exospheric dynamics.
+  Long-term study of the exosphere has not been a priority on any mission, and only 4 wide-field images have ever been acquired.
+
+The next section will describe the Carruthers orbit, camera geometry, an emission model of Lyman-$\alpha$ propagation through exospheric hydrogen and an overview of the instrument model \st{and end with the post-processing procedure for converting raw sensor measurements to salient science constraints}.
 
 
 \section{Measurements and Emission Model}
 \label{sec:measurement_constraints}
 
-This section will describe the Carruthers orbit, camera geometry, an emission model of Lyman-$\alpha$ interaction with and propagation through exospheric hydrogen, instrument model overview, and end with the post-processing procedure for converting raw sensor measurements to salient science constraints.
+  \st{The Geocentric Solar Ecliptic (GSE) coordinate system is a natural fit when describing spacecraft position and the exospheric hydrogen distribution, since radiation pressure is expected to impose Sun-Earth alignment on global exospheric structure.  The rest of this manuscript uses GSE in units of Earth radii (1 Re = 6371 km) either in cartesian or spherical coordinates.}
 
-  The Geocentric Solar Ecliptic (GSE) coordinate system is a natural fit when describing spacecraft position and the exospheric hydrogen distribution, since radiation pressure is expected to impose Sun-Earth alignment on global exospheric structure.  The rest of this manuscript uses GSE in units of Earth radii (1 Re = 6371 km) either in cartesian or spherical coordinates.
-
-  Carruthers will be inserted into a halo orbit around the L1 Lagrange point (about 1.5 million km from Earth, 235 Re), which is distant enough to observe the entirety of the geocorona from an outside vantage
+  Carruthers was inserted into a halo orbit around the L1 Lagrange point (about 1.5 million km from Earth, 235 Re), which is distant enough to observe the entirety of the geocorona from an outside vantage
   over its mission lifetime \cite{baliukin}.
 
   This orbit deviates above/below the ecliptic plane by ±7° (31 Re) and ±28° (112 Re) in the dawn/dusk direction from the Sun-Earth line, providing angular measurement diversity for tomographic analysis of the exosphere, shown in Figure \ref{fig:orbit_details}.
 
-Carruthers is equipped with two co-aligned UV cameras and will observe global exospheric emission at Lyman-$\alpha$ from a distant vantage, providing constraints on the global distribution of hydrogen.
+Carruthers is equipped with two co-aligned UV cameras and observes global exospheric emission at Lyman-$\alpha$ from a distant vantage, providing constraints on the global distribution of hydrogen.
 The Narrow Field Imager (NFI) observes the inner exosphere at high resolution on a 30 minute cadence and the Wide Field Imager (WFI) observes global distribution of exospheric hydrogen on a 60 minute cadence.
   A summary of camera geometry specifications is given in Table \ref{tab:camera_specs}.
 
@@ -105,7 +149,7 @@ The Narrow Field Imager (NFI) observes the inner exosphere at high resolution on
     \label{tab:camera_specs}
   \end{table*}
 
-  Together, these cameras are capable of measuring both the fast-evolving dynamics of the inner exosphere and the global distribution of hydrogen along with the interplanetary background Lyman-$\alpha$ signal (discussed in the next section).  Figure \ref{fig:fov} shows the field of view (FOV) of the cameras relative to the inner exosphere boundary and outer exospheric limit.
+  Together, these cameras are capable of measuring both the fast-evolving dynamics of the inner exosphere and the global distribution of hydrogen along with the interplanetary background Lyman-$\alpha$ signal (discussed in the next section).  Figure \ref{fig:fov} shows the field of view (FOV) of the cameras relative to the inner optically thin boundary and outer exospheric limit.
 
 
 \begin{figure}[h]
@@ -129,8 +173,7 @@ The Narrow Field Imager (NFI) observes the inner exosphere at high resolution on
 In order to recover a hydrogen density distribution from measurements, it is necessary to mathematically model how Lyman-$\alpha$ photons propagate through the exosphere and enter the camera.
 This is known as an emission model and is a central component of tomographic retrieval algorithms.
 
-  Numerically modeling the physics of radiative transfer is a computationally complex task, as solar Lyman-$\alpha$ photons entering the atmosphere usually scatter multiple times, creating nonlinear interdependencies between distant portions of the exosphere.  However, in regions of the atmosphere where hydrogen is sparse (known as the optically thin regime) it is a valid approximation that incident solar photons resonantly scatter only once \cite{ostgaard}, simplifying computational requirements and implementation complexity of the emission model.
-
+  \st{Numerically modeling the physics of radiative transfer is a computationally complex task, as solar Lyman-$\alpha$ photons entering the atmosphere usually scatter multiple times, creating nonlinear interdependencies between distant portions of the exosphere.  However,} In regions of the atmosphere where hydrogen is sparse (known as the optically thin regime) it is a valid approximation that incident solar photons resonantly scatter only once \cite{ostgaard}, simplifying computational requirements and implementation complexity of the emission model.
   Anderson and Hord Jr. \cite{opticaldepththin} define the optically thin regime as starting when $\tau <= 0.1$, where optical depth $\tau$ is a measure of the proportion of photons scattering only once.
 
   With these assumptions, the measurement by the spacecraft is proportional to a line integral of the total mass of hydrogen present in the atmosphere along the LOS of a particular pixel, given by photon radiance
@@ -174,21 +217,21 @@ This is known as an emission model and is a central component of tomographic ret
 
 The scattering phase function $\phi$ represents the directional distribution of resonantly-scattered photons relative to the direction of the Sun @chamberlain.
 
-The solar g factor $g_t$ (phot/s/atom) relates hydrogen density (atoms/cm³) to photon flux emitted per unit volume (phot/s/cm³) \cite{gfactor}.   The quantity $g_t / (4 \pi) \phi(\beta)$ describes the rate of photons being emitted into a part of the sky (1 steradian) from a unit volume of gas and is assumed to be a known, external input to the emission model.  The solar g factor is proportional to incident solar Lyman-α flux at line center, which is time-varying and measured on-orbit.
+The solar g factor $g_t$ (phot/s/atom) relates hydrogen density (atoms/cm³) to photon flux emitted per unit volume (phot/s/cm³) \cite{gfactor}.   The quantity $g_t / 4 \pi \cdot \phi(\beta)$ describes the rate of photons being emitted into a part of the sky (1 steradian) from a unit volume of gas and is assumed to be a known, external input to the emission model.  The solar g factor is proportional to incident solar Lyman-$\alpha$ flux at line center, which is time-varying and measured on-orbit.
 
-    Finally, $\bm{a}_t (\vc{s})$ is a unitless multiplicative correction factor (assumed known) to account for high-density regions of the inner optically thick exosphere which act as a secondary source of Lyman-α photons illuminating the outer exosphere from below.
+    Finally, $\bm{a}_t (\vc{s})$ is a unitless multiplicative correction factor (assumed known) to account for high-density regions of the inner optically thick exosphere which act as a secondary source of Lyman-$\alpha$ photons illuminating the outer exosphere from below.
 
 Zoennchen et al. \cite{zoennchen_new} have found that extending the optically thin model to include extinction along the LOS and extinction between the Sun and scattering point reduced discrepancy between tomographic retrievals and physics-based simulations.  The scope of this manuscript does not include these correction terms but may be included in a future work.
 
-A tenuous distribution of hydrogen throughout the solar system, known as IPH, also contributes to the line-integrated Lyman-α radiance detected by the spacecraft.
-  IPH, like solar g factor, will be measured independently by Carruthers and is assumed to be known.
+A tenuous distribution of hydrogen throughout the solar system, known as interplanetary hydrogen (IPH), also contributes to the line-integrated Lyman-$\alpha$ radiance detected by the spacecraft.
+  IPH, like solar g factor, will be measured independently by Carruthers (FIXME: cite GISSMO?) and is assumed to be known.
   The impact of biases introduced by IPH subtraction has been considered to make sure retrievals still meet error requirements.
-    Other unwanted sources of Lyman-α signal which violate emission model assumptions include the Moon and stars and the optically thick exosphere, as shown in @masks, but these sources will be masked and not used as retrieval constraints.  Together, these radiance sources are referred to as $I_\text{bkg}$.
+    Other unwanted sources of Lyman-$\alpha$ signal which violate emission model assumptions include the Moon and stars and the optically thick exosphere, as shown in Figure \ref{fig:masks}, but these sources will be masked and not used as retrieval constraints.  Together, these radiance sources are referred to as $I_\text{bkg}$.
 
 
-%% ======================== PREPROCESSING ======================
+%% ======================== CALIBRATION AND MASKING ======================
 
-\section{Preprocessing}
+\section{Calibration and Masking}
 
 Raw sensor measurements (digital number, DN) must be calibrated to column densities (atoms/cm²) before they can be ingested by the retrieval algorithm.
   The details of calibration are out of scope of this manuscript, but can be found in (FIXME: cite Alex calibration paper.)
@@ -238,37 +281,42 @@ Raw sensor measurements (digital number, DN) must be calibrated to column densit
   \label{fig:earth_fov_science}
 \end{figure}
 
-  A final step of post-processing is to bin the native 512² pixel WFI and 1024² pixel NFI images to a lower resolution.  The dense LOS spatial sampling and fast temporal cadence of these cameras creates significant memory and computational requirements for the retrieval algorithm, which can be avoided by downsampling images in a way that preserves as much detail as possible.  This downsampling is similar to the stacking and binning described in (FIXME: cite Alex paper), but occurs after downlink.  A polar binning scheme is well-suited for retrievals due to the roughly spherically-symmetric distribution of the exosphere.  Within the Carruthers mission, this is referred to as science pixel binning and shown in Figure \ref{fig:earth_fov_science}. Similarly, temporal averaging can reduce the volume of data ingested by the retrieval algorithms without much loss of information on exosphere dynamic evolution, especially during geomagnetically quiet conditions.  The corners of the detector are clipped as they are blocked by the instrument's circular apertures and contain no Lyman-$\alpha$ data.  These data reduction techniques improve the memory resources required during retrieval and without significant loss of information for the particular spatial and temporal binning parameters chosen.
+  The final step of post-processing is to bin the native 512² pixel WFI and 1024² pixel NFI images to a lower resolution
+  The dense LOS spatial sampling and fast temporal cadence of these cameras creates significant memory and computational requirements for the retrieval algorithm, which can be avoided by downsampling images in a way that preserves as much detail as possible.
 
-    This section has focused on treating a single detector pixel $j$ and associated LOS at a single time index $t$ for the sake of notational simplicity, but tomographic retrieval algorithms rely on many measurements from different angles to fully constrain a reconstruction.
-    This manuscript uses the convention $\bm{y} = \{y_{t,j} | \forall t, \forall j\}$ to denote a stack of calibrated 2D measurements, which will be used to retrieve a 3D H density distribution in the next chapter.
+  Carruthers utilizes a polar-binning scheme (referred to as science pixel binning) with (100, 50) radius/azimuth polar pixels for both WFI and NFI cameras, as shown in Figure \ref{fig:earth_fov_science}.
+  \st{This downsampling is similar to the stacking and binning described in (FIXME: cite Alex paper), but occurs after downlink.  A polar binning scheme is well-suited for retrievals due to the roughly spherically-symmetric distribution of the exosphere.  Within the Carruthers mission, this is referred to as science pixel binning and shown in Figure XXX (FIXME)}.
+Similarly, temporal averaging reduces the volume of data ingested by the retrieval algorithms without significant loss of information on exosphere dynamic evolution, especially during geomagnetically quiet conditions.  The corners of the detector are masked as they are blocked by the instrument's circular apertures and contain no Lyman-$\alpha$ data.  \st{These data reduction techniques improve the memory resources required during retrieval and without significant loss of information for the particular spatial and temporal binning parameters chosen.}
+
+    This section has focused on treating a single detector pixel $j$ and associated LOS at a single time index $t$. \st{for the sake of notational simplicity, but tomographic retrieval algorithms rely on many measurements from different angles to fully constrain a reconstruction.
+    This} The rest of this manuscript uses the convention $\bm{y} = \{y_{t,j} | \forall t, \forall j\}$ to denote a stack of calibrated 2D measurements, which will be used to retrieve a 3D H density distribution in the next chapter.
 
 
 %% ======================== INVERSE PROBLEM ======================
 
 
-\section{Inverse Problem Formulation and Density Model}\label{sec:inverse_problem}
+\section{Discretization and Inverse Problem}\label{sec:inverse_problem}
 
-An inverse problem is the procedure of determining the causative factors of a set of measurements derived from an observation process.  In exospheric tomography, the factor driving the magnitude of column density measurements is the density distribution of hydrogen in the regions being observed.  Figure \ref{fig:inverse_problem_schematic} shows a generalized example of an inverse problem
+An inverse problem is the procedure of determining the causative factors of a set of measurements derived from an observation process.  In exospheric tomography, the factor driving the magnitude of column density measurements is the density distribution of hydrogen in the regions being observed.  \st{Figure \ref{fig:inverse_problem_schematic} shows a generalized example of an inverse problem}
 
-\begin{figure}[h]
-  \includegraphics[width=1\linewidth]{figures/inverse_problem}
-  \caption{General schematic for an observing system and inverse problem}
-  \label{fig:inverse_problem_schematic}
-\end{figure}
+%% \begin{figure}[h]
+%%   \includegraphics[width=1\linewidth]{figures/inverse_problem}
+%%   \caption{General schematic for an observing system and inverse problem}
+%%   \label{fig:inverse_problem_schematic}
+%% \end{figure}
 
-where $\bm{\rho}$ and $\bm{\hat{\rho}}$ are the ground truth and estimated density distribution, $I$ and $C$ are instrument model and calibration, $\bm{y}$ are column density measurements, $\epsilon$ is measurement noise,  $R$ is a retrieval algorithm, and $F_0$ is a forward tomographic operator describing reality while $F$ is a numerical approximation.  This distinction between forward operators matters when considering model uncertainty or mismatch discussed in (FIXME: remove this reference, will not include in paper).
+\st{where $\bm{\rho}$ and $\bm{\hat{\rho}}$ are the ground truth and estimated density distribution, $I$ and $C$ are instrument model and calibration, $\bm{y}$ are column density measurements, $\epsilon$ is measurement noise,  $R$ is a retrieval algorithm, and $F_0$ is a forward tomographic operator describing reality while $F$ is a numerical approximation.  This distinction between forward operators matters when considering model uncertainty or mismatch discussed in (FIXME: remove this reference, will not include in paper).}
 
-\subsection{Discretization}\label{sec:discretization}
+In general, direct analytic solutions to tomographic inverse problems are infeasible, necessitating a numerical approach where the forward operator is discretized and the solution space is divided into a finite grid of non-overlapping regions called voxels where density is assumed to be constant.
 
-In general, direct analytic solutions to tomographic estimation problems are infeasible, necessitating a numerical approach where the solution space is divided into a finite grid of $N$ non-overlapping regions called voxels where density is assumed to be constant.  There are a large variety of grid types to choose from, including regular grids (e.g. spherical, cylindrical, cartesian), non-regular grids which may utilize hierarchical structures (e.g. octree) and tetrahedral meshes.
-Some of these discretizations schemes have been designed to adaptively update voxel boundaries during retrieval to better fit the object being retrieved \cite{adaptivemesh1}.
 
-Choosing a discretization grid which is well-suited to the data is critical, as an improper grid can create aliasing and other artifacts that cause the numerical result to deviate from the functions they approximate.  Since the exosphere is well-understood to smoothly vary with larger density gradients at lower altitudes, a regular spherical grid with logarithmically spaced radial bins is appropriate.  As opposed to more sophisticated gridding schemes such as cubed sphere or HEALPIX \cite{healpix}, regular grids allows for the use of a simple multidimensional array as the underlying data structure, and the property of shared boundaries between voxels simplifies tomography calculations, as demonstrated in Tomosphero (FIXME: introduce tomosphero earlier) \cite{tomosphero} (FIXME: tomosphero citation).
+\st{There are a large variety of grid types to choose from, including regular grids (e.g. spherical, cylindrical, cartesian), non-regular grids (HEALPIX \cite{healpix}, cubed sphere), adaptive grids \cite{adaptivemesh1}, or grids which may utilize hierarchical structures (octree) and tetrahedral meshes.
+
+Choosing a discretization grid which is well-suited to the data is critical, as an improper grid can create aliasing and other artifacts that cause the numerical result to deviate from the functions they approximate.  Since the exosphere is well-understood to smoothly vary with larger density gradients at lower altitudes, a regular spherical grid with logarithmically spaced radial bins is appropriate.  As opposed to more sophisticated gridding schemes, regular grids allows for the use of a simple multidimensional array as the underlying data structure, and the property of shared boundaries between voxels simplifies tomography calculations, as demonstrated in Tomosphero (FIXME: introduce tomosphero earlier) \cite{tomosphero} (FIXME: tomosphero citation).}
 
     The regular spherical grid used in this manuscript has its 0° elevation pole aligned to ecliptic north (+Z Cartesian GSE axis) and ±180° azimuth branch point pointed away from the Sun (-X Cartesian GSE axis), as shown in Figure \ref{fig:grid_details}.
 
-    This manuscript uses convention $r$, $e$, $a$ when referring to radial, elevational, and azimuthal dimensions to avoid ambiguity with astrophysical versus mathematical conventions for spherical coordinates as in Table \ref{tab:sph_convention} that denote the elevational and azimuthal dimensions differently.
+    This manuscript uses notation convention $r$, $e$, $a$ when referring to radial, elevational, and azimuthal dimensions to avoid ambiguity with astrophysical versus mathematical conventions for spherical coordinates as in Table \ref{tab:sph_convention} that denote the elevational and azimuthal dimensions differently.
 
 \begin{figure}[h]
   \centering
@@ -280,7 +328,7 @@ Choosing a discretization grid which is well-suited to the data is critical, as 
 \begin{table}[h]
   \centering
   \setlength{\tabcolsep}{4pt} % Default value: 6pt
-  \caption{Spherical coordinate conventions.}
+  \caption{Spherical coordinate notation.}
   \begin{tabular}{@{}lcccc@{}}
     \toprule
     \thead{Dimension} &
@@ -297,9 +345,7 @@ Choosing a discretization grid which is well-suited to the data is critical, as 
   \label{tab:sph_convention}
 \end{table}
 
-The grid resolution necessary to avoid aliasing and sample errors is data-dependent and was selected by exhaustive search to keep introduced error small.
-
-\subsection{Inverse Problem}
+The grid resolution necessary to avoid aliasing and sample errors is data-dependent and was selected by exhaustive search to keep introduced error small while minimizing total number of voxels.
 
 Under the conditions described in Section \ref{sec:measurement_constraints} (single scattering in an optically-thin exosphere) and ignoring noise, tomographic inversion can be formulated as the solution of the linear inverse problem
 
@@ -307,39 +353,46 @@ $$\bm{y} = F \bm{\rho}$$
 
 with measurements $\bm{y}$, forward operator $F$, and density $\bm{\rho}$.
 
-Direct inversion of the tomographic operator requires that the matrix $F$ be non-singular in order for an inverse $F^{-1}$ to exist.  However, tomography problems generally have fewer measurement constraints LOS than free variables (voxels), making them ill-posed (lacking existence, uniqueness or stability of solutions).
+Direct inversion of the tomographic operator requires that the matrix $F$ be non-singular in order for an inverse $F^{-1}$ to \gt{uniquely} exist.  However, tomography problems generally have fewer measurement constraints LOS than free variables (voxels), making them ill-posed (lacking existence, uniqueness or stability of solutions).
 
+While direct inversion of $F$ is impossible, the retrieval problem $R$ of obtaining estimate $\hat{\bm{\rho}}$ can be reformulated as a minimization of the objective function
 
-While inversion of $F$ is impossible, the problem of obtaining estimate $\hat{\bm{\rho}}$ is sometimes reformulated as a minimization of some objective function, such as the common least squares
-
-\begin{equation*}
-  \hat{\bm{\rho}} = R(\bm{y}) = \min_{\bm{\rho}} || \bm{y} - F \bm{\rho} ||_2^2
-\end{equation*}
+\begin{equation}
+  \hat{\bm{\rho}} = R(\bm{y}) = \min_{\bm{\rho}} || \bm{y} - F M(\bm{c}) ||_2^2 + \mathcal{R}_1(\bm{c}, \bm{\rho}) + ...
 \label{eqn:cost_function}
+\end{equation}
 
-A generalized inverse such as the Moore-Penrose pseudoinverse, can be constructed from $F$ which selects the solution $\bm{\rho}$ with the smallest norm or which best fits the measurements.  Another approach is to assume that $\bm{\rho}$ has some low degree-of-freedom representation on a subspace (linear) or manifold (non-linear) within the space of all solutions.  Such a mapping $M$ is referred to as a model in this manuscript and is represented as
+\gt{where $M$ is a parametric representation of density $\bm{\rho}$ (referred to as a model in this manuscript), and $\mathcal{R}$ is a regularization term.}
 
-  $$\bm{\rho} = M(\bm{c})$$
+%% \gt{Together, the model and regularizers serve to , especially in the presence of noise where small perturbations in the measurements $\bm{y}$ are amplified greatly in the inversion process.}
 
-where $\bm{c}$ are the low degree-of-freedom coefficients.  If the model is sufficiently low-dimensional and linear, then uniqueness is guaranteed if a solution exists.
+\st{A generalized inverse such as the Moore-Penrose pseudoinverse, can be constructed from $F$ which selects the solution $\bm{\rho}$ with the smallest norm or which best fits the measurements.  Another approach is to assume that $\bm{\rho}$ has some low degree-of-freedom representation on a subspace (linear) or manifold (non-linear) within the space of all solutions.}
 
-However, this solution may still be ill-conditioned, or unstable in the presence of noise.  In these cases, $F$ is usually rank-deficient or has small singular values meaning that small perturbations in the measurements $\bm{y}$ are amplified greatly in the inversion process.
+
+
+%% If the model is sufficiently low-dimensional and linear, then uniqueness is guaranteed if a solution exists.
+
+\gt{The model serves reduce the number of plausible solutions by assuming that $\bm{\rho}$ has some low degree-of-freedom representation $\bm{c}$ on a subspace (linear) or manifold (non-linear) within the space of all solutions.}
+
+However, this solution may still be ill-conditioned, or unstable in the presence of noise where  small perturbations in the measurements $\bm{y}$ are amplified greatly in the inversion process.
     This is especially true of computational imaging problems like tomography, where smoothing effects of integration dampen the high frequency information about $\bm{\rho}$ available in the measurements.
+The regularization terms in Equation \ref{eqn:cost_function} encode prior knowledge about $\bm{\rho}$ and $\bm{c}$ which may not be captured by the model and can be used to combat ill-posedness.
 
+  \st{An alternative approach is to view inverse problems as a probabilistic inference problem which uses Bayes theorem to model uncertainty in reconstruction $\bm{\rho}$ given measurements $\bm{y}$.}
 
-A common technique for addressing instability is to add additional terms to Equation \ref{eqn:cost_function} which encode prior knowledge about the distribution of $\bm{\rho}$ which may not be captured by the model.  This is known as regularization and can be used to combat ill-posedness.
-  An alternative approach is to view inverse problems as a probabilistic inference problem which uses Bayes theorem to model uncertainty in reconstruction $\bm{\rho}$ given measurements $\bm{y}$.
-
-The issues of solution existence, uniqueness and sensitivity in inverse problems were formally described by Hadamard in the early 20th century and used to define ill-posed and ill-conditioned inverse problems \cite{hadamard} \cite{illposed}.
+\st{The issues of solution existence, uniqueness and sensitivity in inverse problems were formally described by Hadamard in the early 20th century and used to define ill-posed and ill-conditioned inverse problems \cite{hadamard} \cite{illposed}.}
 
     The notation introduced in this section is summarized in Table \ref{tab:symbols} and will be used throughout the manuscript.
 
-  These principles of solution models and regularization have been used historically to guide retrieval algorithms and will be utilized
+  \st{These principles of solution models and regularization have been used historically to guide retrieval algorithms and will be utilized
   by Carruthers for retrieval of exospheric density, described in
-  (FIXME static-retrieval section reference).
+  (FIXME static-retrieval section reference).}
 
+\st{The next section will cover the implementation of forward operator $F$, a critical component of tomographic retrieval which must be implemented efficiently when solving the objective function in an iterative manner.}
 
-The next section will cover the implementation of forward operator $F$, a critical component of tomographic retrieval which must be implemented efficiently when solving the objective function in an iterative manner.
+Carruthers makes extensive use of TomoSphero, a GPU-enabled tomographic projector which implements the forward discretized operator $F$ efficiently for solving the objective function in Equation \ref{eqn:cost_function} in an iterative manner.  TomoSphero has been made open source and published for others to use in tomographic retrieval problems \footnotetext{https://github.com/evidlo/tomosphero}. (FIXME: cite ApJ?)
+
+\gt{The next section will cover the specifics of the model and regularizers used in retrievals for Carruthers.}
 
 \begin{table*}[!t]
   \centering
@@ -369,12 +422,14 @@ The next section will cover the implementation of forward operator $F$, a critic
 \section{Spherical Harmonic Spline Representation}
 \label{sec:shsr}
 
-Zoennchen et al. \cite{zoennchen_new} present a retrieval method (derived from earlier work \cite{zoennchen2011}, \cite{zoennchen2013}, \cite{zoennchen_old}) featuring a partially separable parametric model based on a spherical harmonic representation (SHR).  Partially separable means the model can be expressed as a product of lower-dimensional functions which can decrease computational requirements.
-Spherical harmonics are a family of complex, two-dimensional, continuous, orthonormal functions defined over a spherical domain.  These functions are commonly used in planetary atmospheric sciences \cite{hodges}, atomic physics (electron orbitals), computer graphics and more.  They serve as an analog to the Fourier basis in a spherical domain and approximate smoothly-varying spherical functions by linear combination of the basis.
+Zoennchen et al. \cite{zoennchen_new} presented a retrieval method (derived from earlier work \cite{zoennchen2011}, \cite{zoennchen2013}, \cite{zoennchen_old}) featuring a partially separable parametric model based on a spherical harmonic representation (SHR), meaning the model can be expressed as a product of lower-dimensional functions.
+Spherical harmonics are a family of complex, two-dimensional, continuous, orthonormal functions defined over a spherical domain.
+\st{These functions are commonly used in planetary atmospheric sciences \cite{hodges}, atomic physics (electron orbitals), computer graphics and more.}
+They serve as an analog to the Fourier basis in a spherical domain and approximate smoothly-varying spherical functions by linear combination of the basis.
 
 %% // FIXME: ital degree order
 
-Spherical harmonics are typically denoted $Y_(l m)(e, a)$ where $l$ and $m$ are known as the function degree and order.  In planetary physics, the convention is to denote coefficients of this linear combination as $A_(l m)$ (when $m \geq 0$) and $B_{l m}$ (when $m < 0$).  Figure \ref{fig:sph_harm} gives a graphical overview of the real/imaginary parts of the first few degrees of spherical harmonic functions.
+Spherical harmonics are typically denoted $Y_{l m}(e, a)$ where $l$ and $m$ are known as the function degree and order.  In planetary physics, the convention is to denote coefficients of this linear combination as $A_{l m}$ (when $m \geq 0$) and $B_{l m}$ (when $m < 0$).  Figure \ref{fig:sph_harm} gives a graphical overview of the real/imaginary parts of the first few degrees of spherical harmonic functions.
 
 \begin{figure}[h]
   \includegraphics[width=1\linewidth]{figures/harm}
@@ -389,18 +444,29 @@ The model density distribution assumed by Zoennchen et al. \cite{zoennchen_new} 
   \label{eqn:radial_decay}
 \end{equation}
 
+\begin{align*}
+  \text{SHR}(r, e, a) = \\
+    \sqrt{4 \pi} \sum_{l=0}^3 \sum_{m=0}^l
+     &A_{l m}(r) \cdot \text{Re}[Y_{l m}(e, a)] \\
+    +& B_{l m}(r) \cdot \text{Imag}[Y_{l m}(e, a)]
+\end{align*}
 
-Previous models are either incapable of representing spherical asymmetries, require a density prior (problematic for an understudied atmospheric regime), or lack the interpretability of a spherical harmonic basis.
-This method replaces the relatively strong assumption of an inverse power law governing radial density variation with a more adaptable cubic spline model.
+\begin{align*}
+  A_{l m}(r) &= a_{l m} + b_{l m} \ln{r} \\
+  B_{l m}(r) &= p_{l m} + q_{l m} \ln{r}
+\end{align*}
+
+\st{Previous models are either incapable of representing spherical asymmetries, require a density prior (problematic for an understudied atmospheric regime), or lack the interpretability of a spherical harmonic basis.}
+
+This section describes a new partially separable model which also uses spherical harmonics as basis functions \st{like the one used by Zoennchen et al}.
+but replaces the relatively strong assumption of an inverse power law governing radial density variation with a more adaptable cubic spline model.
 This formulation is less strict about the shape of radial density profiles but still enforces smoothness of spherical harmonic coefficients.
-
-This section describes a new partially separable model which uses spherical harmonics as basis functions like the one used by Zoennchen et al.
 
 The density model is written as
 
 \begin{align}
   M(\bm{c}) &:= H S \bm{c} = \sum_{l=0}^L \sum_{m=-l}^l H_{l m}(e, a) S_{l m}(r) \\
-  S_{l m}(r) &= \sum_{k=1}^K c_{l m k} B_{k 2}(r)
+  S_{l m}(r) &= \sum_{k=1}^K c_{l m k} B_{k}(r)
 \end{align}
 
 \begin{equation}
@@ -411,7 +477,7 @@ The density model is written as
   \end{cases}
 \end{equation}
 
-  where $S_{l m}(r)$ is a cubic spline function composed of $K$ third order B-splines ${B_{1 2}, ...}$ that define spherical harmonic coefficients between $K$ radially log-spaced control point shells, illustrated in Figure \ref{fig:sph_harm_spline} with truncation order $L=3$.  This basis function formulation for $H_{l m}$ is equivalent to the one presented above but avoids notational awkwardness when $m \geq 0$ versus $m < 0$.
+  where $S_{l m}(r)$ is a 1D cubic spline function composed of $K$ third order B-splines $\{B_1, ..., B_K\}$ that define spherical harmonic coefficients between $K$ radially log-spaced control point shells, illustrated in Figure \ref{fig:sph_harm_spline} with truncation order $L=3$.  This basis function formulation for $H_{l m}$ is equivalent to the one presented above but avoids notational awkwardness when $m \geq 0$ versus $m < 0$.
 
 
 \begin{figure}[h]
@@ -420,16 +486,20 @@ The density model is written as
   \label{fig:sph_harm_spline}
 \end{figure}
 
-The spherical harmonic functions are aligned to the GSE coordinate system, with +Z as the primary axis of symmetry and the positive bulge of $H_(1 1)$ oriented towards the Sun in the +X direction.
+The spherical harmonic functions are aligned to the GSE coordinate system, with +Z as the primary axis of symmetry and the positive bulge of $H_{1 1}$ oriented towards the Sun in the +X direction.
 
 The number and location of the $K$ control points used in the spline functions and the maximum spherical harmonic degree $L$ are selected at model initialization time.
 
-(FIXME - remove this) static-justification justifies specific choices of $K$ and $L$ for the Carruthers mission.
+\st{(FIXME - remove this) static-justification justifies specific choices of $K$ and $L$ for the Carruthers mission.}
 
-The model inputs are $\bm{c} = \{c_{0 0 0}, ...\}$ and the minimization problem is
+The model inputs are
+
+$$\bm{c} = \{c_{l m k}, ... : l \leq L, |m| \leq l, k  \leq K \}$$
+
+and the minimization problem is
 
 \begin{align}
-    \hat{\bm{c}} =& \arg \min_{\bm{c}} ||\bm{y} - F(M(\bm{c}))||_1 \notag \\
+    \hat{\bm{c}} =& \arg \min_{\bm{c}} ||\bm{y} - FM(\bm{c})||_1^2 \notag \\
     &+ \lambda_1 ||S(\bm{c})||_1 + \lambda_2 ||\text{clip}_{(-\infty, 0)}(M(\bm{c}))||_1
     \label{eqn:sphharmspline_min}
 \end{align}
@@ -451,21 +521,22 @@ The model inputs are $\bm{c} = \{c_{0 0 0}, ...\}$ and the minimization problem 
 Factors such as solar g factor, instrument radiation levels and detector health can influence measurement SNR and therefore the quality of the H density reconstructions.  Additionally, the posedness of the inverse problem introduced in Section \ref{sec:inverse_problem} is vantage-dependent resulting in increased reconstruction error for exospheric regions with poor LOS coverage from the given vantage.
 
 To improve the scientific value of retrievals and aid in their interpretability, the data products will include an uncertainty map in the same shape as the H density data products which describes an estimated variance of the H density in each voxel.
-This uncertainty map will be computed by Monte Carlo simulation from an ensemble of synthetic measurements $\{\bm{y'}_1, \bm{y'}_2, ...\}$.  These synthetic measurements will be generated in a bootstrapping process \cite{bootstrap} by resampling a real measurement $\bm{y}$ and knowledge of the instrument model.
-This uncertainty map is too expensive to generate for every retrieval, so the Monte Carlo simulation will run at a reduced cadence and should remain valid for short timescales under identical storm conditions.
+This uncertainty map will be computed by Monte Carlo simulation from an ensemble of synthetic measurements $\{\bm{y'}_1, \bm{y'}_2, ...\}$.  These synthetic measurements will be generated in a bootstrapping process \cite{bootstrap} by resampling a real measurement $\bm{y}$ and by knowledge of the instrument model.
+This uncertainty map is too expensive to generate for every retrieval, so the Monte Carlo simulation will run at a reduced cadence and should remain valid for short timescales under similar geomagnetic storm conditions.
 
 %% ===================== RESULTS AND DISCUSSION ====================
 
-\section{Results and Discussion}
+\section{Validation Test Results}
 
-The retrieval algorithm implicitly encodes assumptions about hydrogen density distribution (smoothness, spherical harmonic structures, etc.), and verification that these assumptions hold requires testing against plausible ground truth densities.  This section overviews some of the ground truth datasets that are available for validation, their origins, spatiotemporal coverage, and model assumptions.
+%% - FIXME - cite preliminary thesis
+%%   - inner mask radius
+%%   cover letter - mention carruthers, exoplanetary studies, stars, planetary atmosphere, rt code
+%%   APJ paper - mention onion peeling
 
-    FIXME - delete - Zoennchen \& TWINS
+The retrieval algorithm implicitly encodes assumptions about hydrogen density distribution (smoothness, spherical harmonic structures, etc.), and verification that these assumptions hold requires testing against plausible ground truth densities.  This section overviews some of the ground truth datasets that are available for validation, their origins, spatiotemporal coverage, and preliminary retrieval results.
 
     Using the parametric model described in \cite{zoennchen_new}, Zoennchen et. al fit several density distributions to Lyman-$\alpha$ radiance measurements observed by TWINS from specific days in both solar minimum and maximum conditions during geomagnetic quiet conditions near Summer solstice.
     Notably, this dataset (referred to as the TWINS SPH dataset) was generated from the spherical harmonic model described in Section \ref{sec:shsr} with order L=3 and stronger assumptions about radial decay of hydrogen distribution.
-
-  FIXME - delete - Vidal-Madjar and Bertaux
 
   Another validation dataset which will be referred to as the VMB (Vidal-Madjar \& Bertaux) model \cite{vmb} is a physics-based simulation of the exosphere.  It takes as input 2D temperature and H density distributions at the exobase (derived from NRLMSIS 2.0 \cite{msis}) and propagates this H density upwards and laterally.  By choosing different dates of the MSIS inputs, the model supports generating both geomagnetically quiet and storm-condition densities.  This simulation utilizes Louisville's equation to propagate constraints from the exobase, ignoring physical processes which are known to influence exospheric hydrogen distribution at large radial distances, such as solar radiation pressure and charge-exchange.
 
@@ -475,17 +546,18 @@ The retrieval algorithm implicitly encodes assumptions about hydrogen density di
   \centering
   %% \setlength{\tabcolsep}{4pt} % Default value: 6pt
   \caption{Synthetic ground-truth datasets}%
-  \begin{tabular}{@{}lcccc@{}}
+  \begin{tabular}{@{}lccccc@{}}
     \toprule
     %% Camera & FOV (degrees) & Resolution (pixels) & Angular Res. (degrees) & Spatial Res. (Re, proj.) & FOV Radius (min-max Re) \\
     \thead{Dataset} &
     \thead{Dynamic/Static} &
     \thead{Derived from} &
     \thead{Storm Condition} &
-    \thead{Coverage} \\
+    \thead{Spatial Coverage} &
+    \thead{Temporal Coverage} \\
     \midrule
-    TWINS SPH \cite{zoennchen_new} & Static & Data \newline (TWINS) & Quiet & 3-25 Re \\
-    VMB \cite{vmb} & Dynamic & Simulation & Quiet/Storm & 3-15 Re \newline 1 year (daily) \\
+    TWINS SPH \cite{zoennchen_new} & Static & Data & Quiet & 3-25 Re & N/A \\
+    VMB \cite{vmb} & Dynamic & Simulation & Quiet/Storm & 3-15 Re & 1 year (daily)\\
     \botrule
   \end{tabular}
   \label{tab:datasets}
@@ -494,7 +566,7 @@ The retrieval algorithm implicitly encodes assumptions about hydrogen density di
 
   FIXME: delete - Retrieval Performance retrieval-validation
 
-  The Spherical Harmonic Spline method introduced in \ref{sec:shsr} will be used by the Carruthers mission for retrieval of the exospheric H density distribution during both geomagnetically active and quiet conditions.  During geomagnetically quiet conditions, the exosphere evolves slowly enough that the H density distribution may be considered static over a 2 week window of evolving vantages.  This window provides sufficient measurement diversity to capture small-scale structures within the density distribution, so Carruthers will use a spherical harmonic truncation order of L=3 during these periods.
+  The Spherical Harmonic Spline method introduced in Section \ref{sec:shsr} will be used by the Carruthers mission for retrieval of the exospheric H density distribution for both geomagnetically active and quiet conditions.  During geomagnetically quiet conditions, the exosphere evolves slowly enough that the H density distribution may be considered static over a 2 week window of evolving vantages.  This window provides sufficient measurement diversity to capture small-scale structures within the density distribution, so Carruthers will use a spherical harmonic truncation order of L=3 during these periods.  All retrievals in this section use regularizer weights $\lambda_1=10^4$ and $\lambda_2=10$.
 
   Figures \ref{fig:recon2w_twins} and \ref{fig:recon2w_vmb} give accuracy error for a single static density retrieval over a 2 week observation window with evolving vantage on the TWINS SPH and VMB datasets.  The "true" coefficients are a direct least-squares fit of the Spherical Harmonic Spline model to the dataset 3D densities without forward model or noise.
   Notably, the retrieval error is the smallest in the transverse (YZ) plane which is especially noticeable in the VMB retrieval.  This plane is oriented roughly perpendicular to measured LOS, which intuitively should give good conditioning, and thus high-quality retrievals, to voxels in this region.  Vertical gray bars indicate the location of spline control points.
@@ -551,7 +623,7 @@ The retrieval algorithm implicitly encodes assumptions about hydrogen density di
   \label{fig:recon2w_twins_montecarlo}
 \end{figure}
 
-\begin{table*}[h!]
+\begin{table}[h]
   \centering
   %% \setlength{\tabcolsep}{4pt} % Default value: 6pt
   \caption{Reconstruction parameters}%
@@ -570,7 +642,7 @@ The retrieval algorithm implicitly encodes assumptions about hydrogen density di
     \botrule
   \end{tabular}
   \label{tab:quiet_recon_params}
-\end{table*}
+\end{table}
 
   During geomagnetic storms, the above static assumption no longer holds and the exosphere evolves significantly over a period of hours.  In these periods, Carruthers will use an observation window of 6 hours and limit truncation order to L=0 (spherically symmetric) to reflect the fact that poor measurement diversity of this short window cannot capture significant non-radial spatial variation.  Reconstruction results for this test are shown in \ref{fig:recon6h_twins} and \ref{fig:recon6h_vmb}.
 
@@ -620,7 +692,7 @@ The retrieval algorithm implicitly encodes assumptions about hydrogen density di
 
 \section{Conclusion}
 
-aaa \ref{tab:data_products}
+The Carruthers Geocorona Observatory is the first NASA mission dedicated to study of the nature of Earth's exosphere.  By making long cadence observations from a distant vantage, the Carruthers mission will produce exospheric H density measurements with a spatiotemporal resolution that exceeds previous studies.  This paper describes an emission model and tomographic retrieval framework for obtaining 3D exospheric reconstructions in the optically-thin regime which are appropriate for both geomagnetically quiet and active conditions.  We introduce a new atmospheric model SHSP which utilizes spherical harmonics and splines to describe an exospheric H distribution with few parameters in a way that is both general and interpretable.  We showed that reconstructions from this model meet mission requirements when evaluated against realistic ground truths with realistic view geometry and measurement noise.
 
 \begin{table*}[h]
   \centering
@@ -642,13 +714,9 @@ aaa \ref{tab:data_products}
   \label{tab:data_products}
 \end{table*}
 
-\begin{appendices}
-
-\section{Section title of first appendix}\label{secA1}
-
-An appendix contains supplementary information that is not an essential part of the text itself but which may be helpful in providing a more comprehensive understanding of the research problem or it is information that is too cumbersome to be included in the body of the paper.
-
-\end{appendices}
+%% \begin{appendices}
+%% \section{Section title of first appendix}\label{secA1}
+%% \end{appendices}
 
 \bibliography{bibliography}
 
