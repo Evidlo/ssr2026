@@ -15,7 +15,6 @@
 %% \usepackage[margin=0.75in, paperwidth=8.5in, paperheight=11in]{geometry}
 \usepackage[margin=0.75in, left=2.75in, right=2.75in, paperwidth=12.5in, paperheight=11in]{geometry}
 \usepackage{harpoon}
-\usepackage[utf8x]{inputenc}
 \usepackage{layout}
 \usepackage{listings}
 \usepackage{manyfoot}
@@ -40,6 +39,7 @@
 
 
 \raggedbottom
+\renewcommand{\floatpagefraction}{0.7}
 %%\unnumbered% uncomment this for unnumbered level heads
 
 %% ================== TITLE PAGE ==================
@@ -76,15 +76,21 @@ In this work, we present a flexible 3D parametric retrieval model which improves
 
 \section{Introduction}\label{intro}
 
+The Carruthers Geocorona Observatory is NASA's first mission dedicated to investigating the fundamental nature of Earth's exosphere. 
+The Carruthers mission is designed to provide novel measurements of exospheric Hydrogen (H) with a spatial resolution and temporal cadence unmatched by any previous study from an ideal vantage: a halo orbit around the Earth-Sun L1 Lagrange point. 
+From this vantage, the Carruthers will have an unobstructed Earth-nadir view and full control over its pointing, which enables nearly continuous, high cadence imaging of exospheric H emission. 
+The target observable of the Carruthers mission is the Ultraviolet (UV) Lyman-$\alpha$ emission, due to its brightness and the fact that it can only be observed by spacecraft
+
 Knowledge of the structure of the Earth's exosphere, the outermost layer of atmosphere, is critical for understanding several important atmospheric processes like plasmaspheric refilling and ring current recovery following geomagnetic storms (FIXME: cite).  Additionally, the exosphere serves as the pathway for permanent escape to space of atomic hydrogen (H), the main constituent of the exosphere and a key driver of long-term water loss on Earth.  The Carruthers Geocorona Observatory represents the first spacecraft dedicated to studying this region of our planet's atmosphere, making continuous wide-field observations of scattered Lyman-$\alpha$ H emission from a distant vantage at spatial and temporal resolutions exceeding any previous study.
-Lyman-$\alpha$ is ideal as a target to study the exosphere, as these photons are excited by resonant scattering from atmospheric H and produce very bright emissions that can only be observed by spacecraft.
 
+\begin{figure*}[t!]
+  \centering
+  \includegraphics[height=2.9in]{figures/previous_missions}
+  \caption{Past, current and future observations of exospheric hydrogen at Lyman-$\alpha$.  Carruthers is the only mission dedicated to longterm exospheric study from a distant vantage.  Not representative of actual spacecraft location}
+  \label{fig:previous_mission}
+\end{figure*}
 
-By mathematically modelling the propagation of solar photons through the exosphere, a 3D reconstruction of the exosphere which is consistent with 2D images produced by the Carruthers cameras can be obtained through a tomographic retrieval process.
-
-This paper focuses on the region of the exosphere where H density is low enough that most solar photons scatter once before entering the detector, known as the optically thin regime.  Details of the reconstruction process for the optically thick regime can be found in (FIXME: citation)
-
-  Knowledge of the H density distribution in the exosphere has advanced primarily due to spaceborne (UV) sensing.  While direct measurement is possible with mass spectrometers (e.g. sounding rockets), the sheer size of the exosphere makes this approach impractical.  Ground-based remote sensing has been hampered by the fact that O₂ at lower altitudes is opaque to (UV) and by limited measurement angles due to a fixed sensor platform.
+  Knowledge of the H density distribution in the exosphere has advanced primarily due to spaceborne UV sensing.  While direct measurement is possible with mass spectrometers (e.g. sounding rockets), the sheer size of the exosphere makes this approach impractical.  Ground-based remote sensing has been hampered by the fact that O\textsubscript{2} at lower altitudes is opaque to UV and by limited measurement angles due to a fixed sensor platform.
   However, attempts have been made to exploit vantage evolution of rotating Earth's surface \cite{balmer2}.
   Visible H emission (Balmer-$\alpha$ line) from resonant fluorescence has been observed on the ground for decades \cite{balmer1}, but the signal is very dim and no reliable density distributions have been derived due to limited data constraints from ground-based sensors.  To date, no reliable retrievals have been derived from these measurements.
 
@@ -101,28 +107,26 @@ This paper focuses on the region of the exosphere where H density is low enough 
   In 2015, the PROCYON spacecraft and LAICA instrument captured a single wide-field from 2350 Re, with studies reporting agreement between the retrieved H density distribution and predictions from radiation pressure theory \cite{procyon_laica}.
   In the same year, the dual TWINS spacecraft launched and began acquiring composite Lyman-$\alpha$ measurements, identifying storm-time variations in the exosphere with radial enhancements of H density propagating outwards \cite{gonzalo_storm} \cite{zoennchen2011}.
 
-\begin{figure*}[h!]
-  \centering
-  \includegraphics[height=2.7in]{figures/previous_missions}
-  \caption{Past, current and future observations of exospheric hydrogen at Lyman-$\alpha$.  Carruthers is the only mission dedicated to longterm exospheric study from a distant vantage.  Not representative of actual spacecraft location}
-  \label{fig:previous_mission}
-\end{figure*}
 
   Of these missions, only TWINS and TIMED have observed the exosphere over multi-year timescales, but their low-altitude observations and measurement gaps limit their utility in understanding global exospheric dynamics.
   Long-term study of the exosphere has not been a priority on any mission, and only 4 wide-field images have ever been acquired.
 
-The next section will describe the Carruthers orbit, camera geometry, an emission model of Lyman-$\alpha$ propagation through exospheric hydrogen and an overview of the instrument model \st{and end with the post-processing procedure for converting raw sensor measurements to salient science constraints}.
 
+By mathematically modelling the propagation of solar photons through the exosphere, a 3D reconstruction of the exosphere which is consistent with 2D images produced by the Carruthers cameras can be obtained through a tomographic retrieval process.
+This paper focuses on the region of the exosphere where H density is low enough that most solar photons scatter once before entering the detector, known as the optically thin regime, but details of the retrieval process for the optically thick regime can be found in (FIXME: citation)
+
+
+The next section will describe the Carruthers orbit, camera geometry, an emission model of Lyman-$\alpha$ propagation through exospheric hydrogen and an overview of the instrument model \st{and end with the post-processing procedure for converting raw sensor measurements to salient science constraints}.
 
 \section{Measurements and Emission Model}
 \label{sec:measurement_constraints}
 
   \st{The Geocentric Solar Ecliptic (GSE) coordinate system is a natural fit when describing spacecraft position and the exospheric hydrogen distribution, since radiation pressure is expected to impose Sun-Earth alignment on global exospheric structure.  The rest of this manuscript uses GSE in units of Earth radii (1 Re = 6371 km) either in cartesian or spherical coordinates.}
 
-  Carruthers was inserted into a halo orbit around the L1 Lagrange point (about 1.5 million km from Earth, 235 Re), which is distant enough to observe the entirety of the geocorona from an outside vantage
-  over its mission lifetime \cite{baliukin}.
+  In September 2025, Carruthers was inserted into a halo orbit around the L1 Lagrange point (about 1.5 million km from Earth, 235 Re), distant enough to observe the entirety of the geocorona from an outside vantage
+  over the mission lifetime \cite{baliukin}.
 
-  This orbit deviates above/below the ecliptic plane by ±7° (31 Re) and ±28° (112 Re) in the dawn/dusk direction from the Sun-Earth line, providing angular measurement diversity for tomographic analysis of the exosphere, shown in Figure \ref{fig:orbit_details}.
+  This orbit deviates above/below the ecliptic plane by $\pm$7$^\circ$ (31 Re) and $\pm$28$^\circ$ (112 Re) in the dawn/dusk direction from the Sun-Earth line, providing angular measurement diversity for tomographic analysis of the exosphere, shown in Figure \ref{fig:orbit_details}.
 
 Carruthers is equipped with two co-aligned UV cameras and observes global exospheric emission at Lyman-$\alpha$ from a distant vantage, providing constraints on the global distribution of hydrogen.
 The Narrow Field Imager (NFI) observes the inner exosphere at high resolution on a 30 minute cadence and the Wide Field Imager (WFI) observes global distribution of exospheric hydrogen on a 60 minute cadence.
@@ -142,8 +146,8 @@ The Narrow Field Imager (NFI) observes the inner exosphere at high resolution on
       \thead{Spatial Res. \\ (Re, proj.)} &
       \thead{FOV Radius \\ (min-max Re)} \\
       \midrule
-          WFI & 18° & 512² & $35*10^{-3}$ & 0.12 - 0.16 & 6.0 - 8.3 \\
-          NFI & 3.6° & 1024² & $3.5*10^{-3}$ & 0.059 - 0.081 & 30 - 42 \\
+          WFI & 18$^\circ$ & 512$^2$ & $35*10^{-3}$ & 0.12 - 0.16 & 6.0 - 8.3 \\
+          NFI & 3.6$^\circ$ & 1024$^2$ & $3.5*10^{-3}$ & 0.059 - 0.081 & 30 - 42 \\
       \botrule
     \end{tabular}
     \label{tab:camera_specs}
@@ -181,10 +185,10 @@ This is known as an emission model and is a central component of tomographic ret
   \begin{equation*}
     I_{\text{exo},t} = \frac{g_t}{4 \pi} \phi (\beta)
     \int_S \bm{a}_t (\vc{s}) \bm{\rho}_t (\vc{s}) \dif s
-    \text{  (phot/s/cm²/sr) }
+    \text{  (phot/s/cm$^2$/sr) }
   \end{equation*}
 
-    %% #gt([(phot/s/cm²/sr)])
+    %% #gt([(phot/s/cm$^2$/sr)])
 
   where $S$ is the pixel LOS, $g_t$ is solar g factor, $t$ is time, $\phi$ is the scattering phase function, $\bm{a}_t$ is albedo correction factor, $\vc{s}$ is position vector and $\bm{\rho}$ is hydrogen density, illustrated in Figure \ref{fig:emission_model_physics}.
   Table \ref{tab:emission_units} gives an overview of different measurement quantities and their units.
@@ -205,8 +209,8 @@ This is known as an emission model and is a central component of tomographic ret
     \toprule
     \thead{Quantity} & \thead{Symbol} & \thead{Units} \\
     \midrule
-    Density & $\bm{\rho}$ & atom/cm³ \\
-    Line-integrated radiance & $I_{\text{exo}}$ & phot/s/atom/cm²/sr \\
+    Density & $\bm{\rho}$ & atom/cm$^3$ \\
+    Line-integrated radiance & $I_{\text{exo}}$ & phot/s/atom/cm$^2$/sr \\
     Angular g factor & $g$ & phot/s/atom/sr \\
     Albedo correction factor & $\bm{a}$ & unitless \\
     Scattering phase function & $\phi$ & unitless \\
@@ -217,14 +221,14 @@ This is known as an emission model and is a central component of tomographic ret
 
 The scattering phase function $\phi$ represents the directional distribution of resonantly-scattered photons relative to the direction of the Sun @chamberlain.
 
-The solar g factor $g_t$ (phot/s/atom) relates hydrogen density (atoms/cm³) to photon flux emitted per unit volume (phot/s/cm³) \cite{gfactor}.   The quantity $g_t / 4 \pi \cdot \phi(\beta)$ describes the rate of photons being emitted into a part of the sky (1 steradian) from a unit volume of gas and is assumed to be a known, external input to the emission model.  The solar g factor is proportional to incident solar Lyman-$\alpha$ flux at line center, which is time-varying and measured on-orbit.
+The solar g factor $g_t$ (phot/s/atom) relates hydrogen density (atoms/cm$^3$) to photon flux emitted per unit volume (phot/s/cm$^3$) \cite{gfactor}.   The quantity $g_t / 4 \pi \cdot \phi(\beta)$ describes the rate of photons being emitted into a part of the sky (1 steradian) from a unit volume of gas and is assumed to be a known, external input to the emission model.  The solar g factor is proportional to incident solar Lyman-$\alpha$ flux at line center, which is time-varying and measured on-orbit.
 
     Finally, $\bm{a}_t (\vc{s})$ is a unitless multiplicative correction factor (assumed known) to account for high-density regions of the inner optically thick exosphere which act as a secondary source of Lyman-$\alpha$ photons illuminating the outer exosphere from below.
 
-Zoennchen et al. \cite{zoennchen_new} have found that extending the optically thin model to include extinction along the LOS and extinction between the Sun and scattering point reduced discrepancy between tomographic retrievals and physics-based simulations.  The scope of this manuscript does not include these correction terms but may be included in a future work.
+(FIXME: delete this paragraph?) Zoennchen et al. \cite{zoennchen_new} have found that extending the optically thin model to include extinction along the LOS and extinction between the Sun and scattering point reduced discrepancy between tomographic retrievals and physics-based simulations.  The scope of this manuscript does not include these correction terms but may be included in a future work.
 
 A tenuous distribution of hydrogen throughout the solar system, known as interplanetary hydrogen (IPH), also contributes to the line-integrated Lyman-$\alpha$ radiance detected by the spacecraft.
-  IPH, like solar g factor, will be measured independently by Carruthers (FIXME: cite GISSMO?) and is assumed to be known.
+  IPH, like solar g factor, are measured independently by Carruthers (FIXME: cite GISSMO?) and is assumed to be known.
   The impact of biases introduced by IPH subtraction has been considered to make sure retrievals still meet error requirements.
     Other unwanted sources of Lyman-$\alpha$ signal which violate emission model assumptions include the Moon and stars and the optically thick exosphere, as shown in Figure \ref{fig:masks}, but these sources will be masked and not used as retrieval constraints.  Together, these radiance sources are referred to as $I_\text{bkg}$.
 
@@ -233,13 +237,13 @@ A tenuous distribution of hydrogen throughout the solar system, known as interpl
 
 \section{Calibration and Masking}
 
-Raw sensor measurements (digital number, DN) must be calibrated to column densities (atoms/cm²) before they can be ingested by the retrieval algorithm.
+Raw sensor measurements (digital number, DN) must be calibrated to column densities (atoms/cm$^2$) before they can be ingested by the retrieval algorithm.
   The details of calibration are out of scope of this manuscript, but can be found in (FIXME: cite Alex calibration paper.)
 
   Calibration reverses many of the terms of the emission model given in the previous section and additional distortion introduced by the instrument, resulting in an expression for column density that is independent of any instrument parameters or solar conditions
 
     \begin{equation}
-        y_{t j} \approx \int_{S_{t j}} \bm{a}_t (\vc{s}) \bm{\rho}_t (\vc{s}) \dif s \text{  (atom/cm²)}
+        y_{t j} \approx \int_{S_{t j}} \bm{a}_t (\vc{s}) \bm{\rho}_t (\vc{s}) \dif s \text{  (atom/cm$^2$)}
     \end{equation}
 
   where LOS $S_{t j}$ is annotated with indices $t j$ to emphasize time and pixel dependence.
@@ -281,7 +285,7 @@ Raw sensor measurements (digital number, DN) must be calibrated to column densit
   \label{fig:earth_fov_science}
 \end{figure}
 
-  The final step of post-processing is to bin the native 512² pixel WFI and 1024² pixel NFI images to a lower resolution
+  The final step of post-processing is to bin the native 512$^2$ pixel WFI and 1024$^2$ pixel NFI images to a lower resolution
   The dense LOS spatial sampling and fast temporal cadence of these cameras creates significant memory and computational requirements for the retrieval algorithm, which can be avoided by downsampling images in a way that preserves as much detail as possible.
 
   Carruthers utilizes a polar-binning scheme (referred to as science pixel binning) with (100, 50) radius/azimuth polar pixels for both WFI and NFI cameras, as shown in Figure \ref{fig:earth_fov_science}.
@@ -314,36 +318,16 @@ In general, direct analytic solutions to tomographic inverse problems are infeas
 
 Choosing a discretization grid which is well-suited to the data is critical, as an improper grid can create aliasing and other artifacts that cause the numerical result to deviate from the functions they approximate.  Since the exosphere is well-understood to smoothly vary with larger density gradients at lower altitudes, a regular spherical grid with logarithmically spaced radial bins is appropriate.  As opposed to more sophisticated gridding schemes, regular grids allows for the use of a simple multidimensional array as the underlying data structure, and the property of shared boundaries between voxels simplifies tomography calculations, as demonstrated in Tomosphero (FIXME: introduce tomosphero earlier) \cite{tomosphero} (FIXME: tomosphero citation).}
 
-    The regular spherical grid used in this manuscript has its 0° elevation pole aligned to ecliptic north (+Z Cartesian GSE axis) and ±180° azimuth branch point pointed away from the Sun (-X Cartesian GSE axis), as shown in Figure \ref{fig:grid_details}.
+    The regular spherical grid used in this manuscript has its 0$^\circ$ elevation pole aligned to ecliptic north (+Z Cartesian GSE axis) and $\pm$180$^\circ$ azimuth branch point pointed away from the Sun (-X Cartesian GSE axis), as shown in Figure \ref{fig:grid_details}.
 
-    This manuscript uses notation convention $r$, $e$, $a$ when referring to radial, elevational, and azimuthal dimensions to avoid ambiguity with astrophysical versus mathematical conventions for spherical coordinates as in Table \ref{tab:sph_convention} that denote the elevational and azimuthal dimensions differently.
+    This manuscript uses notation convention $r$, $e$, $a$ when referring to radial, elevational, and azimuthal dimensions to avoid ambiguity with astrophysical and mathematical conventions for spherical coordinates that denote the elevational and azimuthal dimensions differently.
 
 \begin{figure}[h]
   \centering
   \includegraphics[width=.4\linewidth]{figures/sph_convention}
-  \caption{Spherical grid definition and a spherical voxel}
+  \caption{Spherical coordinates definition in GSE}
   \label{fig:grid_details}
 \end{figure}
-
-\begin{table}[h]
-  \centering
-  \setlength{\tabcolsep}{4pt} % Default value: 6pt
-  \caption{Spherical coordinate notation.}
-  \begin{tabular}{@{}lcccc@{}}
-    \toprule
-    \thead{Dimension} &
-    \thead{Physics \\ Convention} &
-    \thead{Math \\ Convention} &
-    \thead{Manuscript \\ Convention} &
-    \thead{Manuscript \\ Range} \\
-    \midrule
-        Radial & $r$ & $r$ & $r$ & [3 Re, 25 Re] \\
-        Elevational & $\theta$ & $\phi$ & $e$ & [0°, 180°] \\
-        Azimuthal & $\phi$ & $\theta$ & $a$ & [-180°, 180°] \\
-    \botrule
-  \end{tabular}
-  \label{tab:sph_convention}
-\end{table}
 
 The grid resolution necessary to avoid aliasing and sample errors is data-dependent and was selected by exhaustive search to keep introduced error small while minimizing total number of voxels.
 
@@ -533,6 +517,7 @@ This uncertainty map is too expensive to generate for every retrieval, so the Mo
 %%   cover letter - mention carruthers, exoplanetary studies, stars, planetary atmosphere, rt code
 %%   APJ paper - mention onion peeling
 
+
 The retrieval algorithm implicitly encodes assumptions about hydrogen density distribution (smoothness, spherical harmonic structures, etc.), and verification that these assumptions hold requires testing against plausible ground truth densities.  This section overviews some of the ground truth datasets that are available for validation, their origins, spatiotemporal coverage, and preliminary retrieval results.
 
     Using the parametric model described in \cite{zoennchen_new}, Zoennchen et. al fit several density distributions to Lyman-$\alpha$ radiance measurements observed by TWINS from specific days in both solar minimum and maximum conditions during geomagnetic quiet conditions near Summer solstice.
@@ -541,6 +526,16 @@ The retrieval algorithm implicitly encodes assumptions about hydrogen density di
   Another validation dataset which will be referred to as the VMB (Vidal-Madjar \& Bertaux) model \cite{vmb} is a physics-based simulation of the exosphere.  It takes as input 2D temperature and H density distributions at the exobase (derived from NRLMSIS 2.0 \cite{msis}) and propagates this H density upwards and laterally.  By choosing different dates of the MSIS inputs, the model supports generating both geomagnetically quiet and storm-condition densities.  This simulation utilizes Louisville's equation to propagate constraints from the exobase, ignoring physical processes which are known to influence exospheric hydrogen distribution at large radial distances, such as solar radiation pressure and charge-exchange.
 
   Table \ref{tab:datasets} gives an overview of these datasets.
+
+
+  FIXME: delete - Retrieval Performance retrieval-validation
+
+  The Spherical Harmonic Spline method introduced in Section \ref{sec:shsr} will be used by the Carruthers mission for retrieval of the exospheric H density distribution for both geomagnetically active and quiet conditions.  During geomagnetically quiet conditions, the exosphere evolves slowly enough that the H density distribution may be considered static over a 2 week window of evolving vantages.  This window provides sufficient measurement diversity to capture small-scale structures within the density distribution, so Carruthers will use a spherical harmonic truncation order of L=3 during these periods.  All retrievals in this section use regularizer weights $\lambda_1=10^4$ and $\lambda_2=10$.
+
+  Figures \ref{fig:recon2w_twins} and \ref{fig:recon2w_vmb} give accuracy error for a single static density retrieval over a 2 week observation window with evolving vantage on the TWINS SPH and VMB datasets.  The "true" coefficients are a direct least-squares fit of the Spherical Harmonic Spline model to the dataset 3D densities without forward model or noise.
+  Notably, the retrieval error is the smallest in the transverse (YZ) plane which is especially noticeable in the VMB retrieval.  This plane is oriented roughly perpendicular to measured LOS, which intuitively should give good conditioning, and thus high-quality retrievals, to voxels in this region.  Vertical gray bars indicate the location of spline control points.
+
+    Additionally, errors are larger in the low-altitude region near the midnight (-X) side of Earth, where no LOS intersect due to occlusion by the Earth and optically-thick exosphere.  Voxels in this region are constrained only by spatial smoothing in the reconstruction model.
 
 \begin{table*}[h]
   \centering
@@ -564,17 +559,7 @@ The retrieval algorithm implicitly encodes assumptions about hydrogen density di
 \end{table*}
 
 
-  FIXME: delete - Retrieval Performance retrieval-validation
-
-  The Spherical Harmonic Spline method introduced in Section \ref{sec:shsr} will be used by the Carruthers mission for retrieval of the exospheric H density distribution for both geomagnetically active and quiet conditions.  During geomagnetically quiet conditions, the exosphere evolves slowly enough that the H density distribution may be considered static over a 2 week window of evolving vantages.  This window provides sufficient measurement diversity to capture small-scale structures within the density distribution, so Carruthers will use a spherical harmonic truncation order of L=3 during these periods.  All retrievals in this section use regularizer weights $\lambda_1=10^4$ and $\lambda_2=10$.
-
-  Figures \ref{fig:recon2w_twins} and \ref{fig:recon2w_vmb} give accuracy error for a single static density retrieval over a 2 week observation window with evolving vantage on the TWINS SPH and VMB datasets.  The "true" coefficients are a direct least-squares fit of the Spherical Harmonic Spline model to the dataset 3D densities without forward model or noise.
-  Notably, the retrieval error is the smallest in the transverse (YZ) plane which is especially noticeable in the VMB retrieval.  This plane is oriented roughly perpendicular to measured LOS, which intuitively should give good conditioning, and thus high-quality retrievals, to voxels in this region.  Vertical gray bars indicate the location of spline control points.
-
-    Additionally, errors are larger in the low-altitude region near the midnight (-X) side of Earth, where no LOS intersect due to occlusion by the Earth and optically-thick exosphere.  Voxels in this region are constrained only by spatial smoothing in the reconstruction model.
-
-
-\begin{figure}[ht]
+\begin{figure}[p]
   \centering
   \begin{subfigure}[t]{1\linewidth}
     \includegraphics[height=1.2in]{figures/recon2w_twins_err}
@@ -593,7 +578,7 @@ The retrieval algorithm implicitly encodes assumptions about hydrogen density di
   \label{fig:recon2w_twins}
 \end{figure}
 
-\begin{figure}[ht]
+\begin{figure}[p]
   \centering
   \begin{subfigure}[t]{1\linewidth}
     \includegraphics[height=1.2in]{figures/recon2w_vmb_err}
@@ -612,6 +597,43 @@ The retrieval algorithm implicitly encodes assumptions about hydrogen density di
   \label{fig:recon2w_vmb}
 \end{figure}
 
+\begin{figure}[p]
+  \centering
+  \begin{subfigure}[t]{1\linewidth}
+    \includegraphics[height=1.2in]{figures/recon6h_twins_err}
+    \caption{Reconstruction Error}
+  \end{subfigure}%
+  \newline
+  \begin{subfigure}[t]{0.45\linewidth}
+    \includegraphics[height=1.3in]{figures/recon6h_twins_coeffs}
+    \caption{Recon. coefficients}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.45\linewidth}
+    \includegraphics[height=1.3in]{figures/recon6h_twins_coeffs_truth}
+    \caption{True coefficients}
+  \end{subfigure}
+  \caption{Six hour TWINS SPH reconstruction results}
+  \label{fig:recon6h_twins}
+\end{figure}
+
+\begin{figure}[p]
+  \centering
+  \begin{subfigure}[t]{1\linewidth}
+    \includegraphics[height=1.2in]{figures/recon6h_vmb_err}
+    \caption{Reconstruction Error}
+  \end{subfigure}%
+  \newline
+  \begin{subfigure}[t]{0.45\linewidth}
+    \includegraphics[height=1.3in]{figures/recon6h_vmb_coeffs}
+    \caption{Recon. coefficients}
+  \end{subfigure}
+  \begin{subfigure}[t]{0.45\linewidth}
+    \includegraphics[height=1.3in]{figures/recon6h_vmb_coeffs_truth}
+    \caption{True coefficients}
+  \end{subfigure}
+  \caption{Six hour VMB SPH reconstruction results}
+  \label{fig:recon6h_vmb}
+\end{figure}
 
   This test was repeated for 50 trials to establish that accuracy requirements are met at the necessary confidence level, shown in \ref{fig:recon2w_twins_montecarlo}.
     The complete model parameters (e.g. control points, spherical harmonic order, etc.) and experimental settings (e.g. grid and view geometry resolution) used for reconstructing both of these cases is given in \ref{tab:quiet_recon_params}.
@@ -648,44 +670,6 @@ The retrieval algorithm implicitly encodes assumptions about hydrogen density di
 
   These results show that despite some non-spherical variation the TWINS SPH and VMB datasets are sufficiently spherically symmetric to be reconstructed with reasonable levels of error.  Notably, the reconstructed and ground truth L=0 coefficients are nearly a perfect match, which matches the expectation of a spherical symmetric retrieval model having good conditioning from nearly any vantage.
 
-\begin{figure}[h]
-  \centering
-  \begin{subfigure}[t]{1\linewidth}
-    \includegraphics[height=1.2in]{figures/recon6h_twins_err}
-    \caption{Reconstruction Error}
-  \end{subfigure}%
-  \newline
-  \begin{subfigure}[t]{0.45\linewidth}
-    \includegraphics[height=1.3in]{figures/recon6h_twins_coeffs}
-    \caption{Recon. coefficients}
-  \end{subfigure}
-  \begin{subfigure}[t]{0.45\linewidth}
-    \includegraphics[height=1.3in]{figures/recon6h_twins_coeffs_truth}
-    \caption{True coefficients}
-  \end{subfigure}
-  \caption{Six hour TWINS SPH reconstruction results}
-  \label{fig:recon6h_twins}
-\end{figure}
-
-\begin{figure}[h]
-  \centering
-  \begin{subfigure}[t]{1\linewidth}
-    \includegraphics[height=1.2in]{figures/recon6h_vmb_err}
-    \caption{Reconstruction Error}
-  \end{subfigure}%
-  \newline
-  \begin{subfigure}[t]{0.45\linewidth}
-    \includegraphics[height=1.3in]{figures/recon6h_vmb_coeffs}
-    \caption{Recon. coefficients}
-  \end{subfigure}
-  \begin{subfigure}[t]{0.45\linewidth}
-    \includegraphics[height=1.3in]{figures/recon6h_vmb_coeffs_truth}
-    \caption{True coefficients}
-  \end{subfigure}
-  \caption{Six hour VMB SPH reconstruction results}
-  \label{fig:recon6h_vmb}
-\end{figure}
-
   This section showed spherical harmonic model reconstruction results for both a large observation window suitable to geomagnetic quiet conditions, and a simpler spherically symmetric retrieval with a short window for storm conditions.  The reconstructions meet mission requirements [(FIXME) given in XXXXX] and were demonstrated to be stable across many reconstruction trials with different noisy measurement realizations.
 
 %% ===================== CONCLUSION ====================
@@ -721,3 +705,4 @@ The Carruthers Geocorona Observatory is the first NASA mission dedicated to stud
 \bibliography{bibliography}
 
 \end{document}
+
