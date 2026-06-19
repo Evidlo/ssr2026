@@ -22,9 +22,12 @@
 \usepackage{mathrsfs}
 \usepackage{multirow}
 \usepackage{subcaption}
+\usepackage{framed}
 \usepackage{textcomp}
 \usepackage[normalem]{ulem}
 \usepackage{xcolor}
+\usepackage[switch]{lineno}
+\linenumbers
 
 
 %% ================= MACROS ======================
@@ -32,7 +35,7 @@
 \newcommand{\vc}[1]{\overrightharp{#1}}
 \newcommand{\bb}[1]{\mathbb{#1}}
 \newcommand{\dif}{\mathop{}\!\mathrm{d}}
-\newcommand{\gt}[1]{\textcolor{green}{#1}}
+\newcommand{\gt}[1]{\textcolor{gray}{#1}}
 \newcommand{\rt}[1]{\textcolor{red}{#1}}
 \newcommand{\st}[1]{{\color{red}\sout{#1}}}
 
@@ -182,11 +185,12 @@ This is known as an emission model and is a central component of tomographic ret
 
   With these assumptions, the measurement by the spacecraft is proportional to a line integral of the total mass of hydrogen present in the atmosphere along the LOS of a particular pixel, given by photon radiance
 
-  \begin{equation*}
+  \begin{equation}
     I_{\text{exo},t} = \frac{g_t}{4 \pi} \phi (\beta)
     \int_S \bm{a}_t (\vc{s}) \bm{\rho}_t (\vc{s}) \dif s
     \text{  (phot/s/cm$^2$/sr) }
-  \end{equation*}
+    \label{eqn:emission_model}
+  \end{equation}
 
     %% #gt([(phot/s/cm$^2$/sr)])
 
@@ -197,7 +201,7 @@ This is known as an emission model and is a central component of tomographic ret
 
 \begin{figure}[h]
   \includegraphics[width=.9\linewidth]{figures/physics}
-  \caption{Emission model overview for a LOS. Not to scale.}
+  \caption{Emission model overview for a LOS. Earth/Moon not to scale. See (FIXME: cite bill) for full orbit description.}
   \label{fig:emission_model_physics}
 \end{figure}
 
@@ -219,16 +223,16 @@ This is known as an emission model and is a central component of tomographic ret
   \label{tab:emission_units}
 \end{table}
 
-The scattering phase function $\phi$ represents the directional distribution of resonantly-scattered photons relative to the direction of the Sun @chamberlain.
+The scattering phase function $\phi$ represents the directional distribution of resonantly-scattered photons relative to the direction of the Sun \cite{chamberlain}.
 
 The solar g factor $g_t$ (phot/s/atom) relates hydrogen density (atoms/cm$^3$) to photon flux emitted per unit volume (phot/s/cm$^3$) \cite{gfactor}.   The quantity $g_t / 4 \pi \cdot \phi(\beta)$ describes the rate of photons being emitted into a part of the sky (1 steradian) from a unit volume of gas and is assumed to be a known, external input to the emission model.  The solar g factor is proportional to incident solar Lyman-$\alpha$ flux at line center, which is time-varying and measured on-orbit.
 
     Finally, $\bm{a}_t (\vc{s})$ is a unitless multiplicative correction factor (assumed known) to account for high-density regions of the inner optically thick exosphere which act as a secondary source of Lyman-$\alpha$ photons illuminating the outer exosphere from below.
 
-(FIXME: delete this paragraph?) Zoennchen et al. \cite{zoennchen_new} have found that extending the optically thin model to include extinction along the LOS and extinction between the Sun and scattering point reduced discrepancy between tomographic retrievals and physics-based simulations.  The scope of this manuscript does not include these correction terms but may be included in a future work.
+\st{(FIXME: delete this paragraph?) Zoennchen et al. \cite{zoennchen_new} have found that extending the optically thin model to include extinction along the LOS and extinction between the Sun and scattering point reduced discrepancy between tomographic retrievals and physics-based simulations.  The scope of this manuscript does not include these correction terms but may be included in a future work.}
 
 A tenuous distribution of hydrogen throughout the solar system, known as interplanetary hydrogen (IPH), also contributes to the line-integrated Lyman-$\alpha$ radiance detected by the spacecraft.
-  IPH, like solar g factor, are measured independently by Carruthers (FIXME: cite GISSMO?) and is assumed to be known.
+  IPH, like solar g factor, are measured independently by Carruthers (FIXME: cite COSSMO?) and is assumed to be known.
   The impact of biases introduced by IPH subtraction has been considered to make sure retrievals still meet error requirements.
     Other unwanted sources of Lyman-$\alpha$ signal which violate emission model assumptions include the Moon and stars and the optically thick exosphere, as shown in Figure \ref{fig:masks}, but these sources will be masked and not used as retrieval constraints.  Together, these radiance sources are referred to as $I_\text{bkg}$.
 
@@ -238,9 +242,60 @@ A tenuous distribution of hydrogen throughout the solar system, known as interpl
 \section{Calibration and Masking}
 
 Raw sensor measurements (digital number, DN) must be calibrated to column densities (atoms/cm$^2$) before they can be ingested by the retrieval algorithm.
-  The details of calibration are out of scope of this manuscript, but can be found in (FIXME: cite Alex calibration paper.)
 
-  Calibration reverses many of the terms of the emission model given in the previous section and additional distortion introduced by the instrument, resulting in an expression for column density that is independent of any instrument parameters or solar conditions
+This calibration process involves the removal of various instrument effects and background signals, such as detector dark current, solar energetic particles, microchannel plate flat fielding, optical distortion, interplanetary hydrogen background, and detector voltage bias (cite Alex 1, 2).  Next, the calibration procedure divides out total instrument sensitivity to obtain radiance which is periodically calibrated against known stellar spectra to account for sensitivity drift over time (cite Alex 3).
+
+Finally, the leading g factor and scattering phase function from the emission model in \ref{eqn:emission_model} are removed resulting in column density that is independent of any instrument parameters or solar conditions.
+
+The procedure is summarized in Figure \ref{fig:procedure}.
+
+\begin{figure}
+
+    \begin{framed}
+    \newcounter{calstep}
+    \noindent
+    \gt{Instrument Effect Calibration}
+    \begin{enumerate}
+      \setcounter{enumi}{\value{calstep}}
+      \item Subtact voltage bias offset
+      \item Subtract dark current \& solar energetic particles
+      \item Divide MCP and optical flat field
+      \item Distortion correction
+      \setcounter{calstep}{\value{enumi}}
+    \end{enumerate}
+
+    \noindent
+    \gt{Photon Signal Background Subtraction}
+    \begin{enumerate}
+      \setcounter{enumi}{\value{calstep}}
+      \item Subtract IPH
+      \setcounter{calstep}{\value{enumi}}
+    \end{enumerate}
+
+    \noindent
+    \gt{Absolute Intensity Calibration}
+    \begin{enumerate}
+      \setcounter{enumi}{\value{calstep}}
+      \item Divide quantum efficiency, pixel etendue APS/MCP gain
+      \item Stellar target calibration
+      \setcounter{calstep}{\value{enumi}}
+    \end{enumerate}
+
+    \noindent
+    \gt{Emission Model Calibration}
+    \begin{enumerate}
+      \setcounter{enumi}{\value{calstep}}
+      \item Divide g factor and scattering phase function
+      \setcounter{calstep}{\value{enumi}}
+    \end{enumerate}
+    \end{framed}
+
+  \caption{Calibration procedure overview}
+  \label{fig:procedure}
+\end{figure}
+
+  Further details of the calibration process can be found in the manuscripts cited above.
+
 
     \begin{equation}
         y_{t j} \approx \int_{S_{t j}} \bm{a}_t (\vc{s}) \bm{\rho}_t (\vc{s}) \dif s \text{  (atom/cm$^2$)}
@@ -337,7 +392,7 @@ $$\bm{y} = F \bm{\rho}$$
 
 with measurements $\bm{y}$, forward operator $F$, and density $\bm{\rho}$.
 
-Direct inversion of the tomographic operator requires that the matrix $F$ be non-singular in order for an inverse $F^{-1}$ to \gt{uniquely} exist.  However, tomography problems generally have fewer measurement constraints LOS than free variables (voxels), making them ill-posed (lacking existence, uniqueness or stability of solutions).
+Direct inversion of the tomographic operator requires that the matrix $F$ be non-singular in order for an inverse $F^{-1}$ to uniquely exist.  However, tomography problems generally have fewer measurement constraints LOS than free variables (voxels), making them ill-posed (lacking existence, uniqueness or stability of solutions).
 
 While direct inversion of $F$ is impossible, the retrieval problem $R$ of obtaining estimate $\hat{\bm{\rho}}$ can be reformulated as a minimization of the objective function
 
@@ -346,9 +401,9 @@ While direct inversion of $F$ is impossible, the retrieval problem $R$ of obtain
 \label{eqn:cost_function}
 \end{equation}
 
-\gt{where $M$ is a parametric representation of density $\bm{\rho}$ (referred to as a model in this manuscript), and $\mathcal{R}$ is a regularization term.}
+where $M$ is a parametric representation of density $\bm{\rho}$ (referred to as a model in this manuscript), and $\mathcal{R}$ is a regularization term.
 
-%% \gt{Together, the model and regularizers serve to , especially in the presence of noise where small perturbations in the measurements $\bm{y}$ are amplified greatly in the inversion process.}
+%% Together, the model and regularizers serve to , especially in the presence of noise where small perturbations in the measurements $\bm{y}$ are amplified greatly in the inversion process.
 
 \st{A generalized inverse such as the Moore-Penrose pseudoinverse, can be constructed from $F$ which selects the solution $\bm{\rho}$ with the smallest norm or which best fits the measurements.  Another approach is to assume that $\bm{\rho}$ has some low degree-of-freedom representation on a subspace (linear) or manifold (non-linear) within the space of all solutions.}
 
@@ -356,7 +411,7 @@ While direct inversion of $F$ is impossible, the retrieval problem $R$ of obtain
 
 %% If the model is sufficiently low-dimensional and linear, then uniqueness is guaranteed if a solution exists.
 
-\gt{The model serves reduce the number of plausible solutions by assuming that $\bm{\rho}$ has some low degree-of-freedom representation $\bm{c}$ on a subspace (linear) or manifold (non-linear) within the space of all solutions.}
+The model serves reduce the number of plausible solutions by assuming that $\bm{\rho}$ has some low degree-of-freedom representation $\bm{c}$ on a subspace (linear) or manifold (non-linear) within the space of all solutions.
 
 However, this solution may still be ill-conditioned, or unstable in the presence of noise where  small perturbations in the measurements $\bm{y}$ are amplified greatly in the inversion process.
     This is especially true of computational imaging problems like tomography, where smoothing effects of integration dampen the high frequency information about $\bm{\rho}$ available in the measurements.
@@ -376,7 +431,7 @@ The regularization terms in Equation \ref{eqn:cost_function} encode prior knowle
 
 Carruthers makes extensive use of TomoSphero, a GPU-enabled tomographic projector which implements the forward discretized operator $F$ efficiently for solving the objective function in Equation \ref{eqn:cost_function} in an iterative manner.  TomoSphero has been made open source and published for others to use in tomographic retrieval problems \footnotetext{https://github.com/evidlo/tomosphero}. (FIXME: cite ApJ?)
 
-\gt{The next section will cover the specifics of the model and regularizers used in retrievals for Carruthers.}
+The next section will cover the specifics of the model and regularizers used in retrievals for Carruthers.
 
 \begin{table*}[!t]
   \centering
@@ -500,13 +555,13 @@ and the minimization problem is
 %% ===================== UNCERTAINTY QUANTIFICATION ====================
 
 
-\section{Uncertainty Quantification}
+%% \section{Uncertainty Quantification}
 
-Factors such as solar g factor, instrument radiation levels and detector health can influence measurement SNR and therefore the quality of the H density reconstructions.  Additionally, the posedness of the inverse problem introduced in Section \ref{sec:inverse_problem} is vantage-dependent resulting in increased reconstruction error for exospheric regions with poor LOS coverage from the given vantage.
+%% Factors such as solar g factor, instrument radiation levels and detector health can influence measurement SNR and therefore the quality of the H density reconstructions.  Additionally, the posedness of the inverse problem introduced in Section \ref{sec:inverse_problem} is vantage-dependent resulting in increased reconstruction error for exospheric regions with poor LOS coverage from the given vantage.
 
-To improve the scientific value of retrievals and aid in their interpretability, the data products will include an uncertainty map in the same shape as the H density data products which describes an estimated variance of the H density in each voxel.
-This uncertainty map will be computed by Monte Carlo simulation from an ensemble of synthetic measurements $\{\bm{y'}_1, \bm{y'}_2, ...\}$.  These synthetic measurements will be generated in a bootstrapping process \cite{bootstrap} by resampling a real measurement $\bm{y}$ and by knowledge of the instrument model.
-This uncertainty map is too expensive to generate for every retrieval, so the Monte Carlo simulation will run at a reduced cadence and should remain valid for short timescales under similar geomagnetic storm conditions.
+%% To improve the scientific value of retrievals and aid in their interpretability, the data products will include an uncertainty map in the same shape as the H density data products which describes an estimated variance of the H density in each voxel.
+%% This uncertainty map will be computed by Monte Carlo simulation from an ensemble of synthetic measurements $\{\bm{y'}_1, \bm{y'}_2, ...\}$.  These synthetic measurements will be generated in a bootstrapping process \cite{bootstrap} by resampling a real measurement $\bm{y}$ and by knowledge of the instrument model.
+%% This uncertainty map is too expensive to generate for every retrieval, so the Monte Carlo simulation will run at a reduced cadence and should remain valid for short timescales under similar geomagnetic storm conditions.
 
 %% ===================== RESULTS AND DISCUSSION ====================
 
@@ -682,17 +737,18 @@ The Carruthers Geocorona Observatory is the first NASA mission dedicated to stud
   \centering
   %% \setlength{\tabcolsep}{4pt} % Default value: 6pt
   \caption{Data products summary.  Altitude coverage is 3-25 Re.}%
-  \begin{tabular}{@{}lcc@{}}
+  \begin{tabular}{@{}llcc@{}}
     \toprule
     %% Camera & FOV (degrees) & Resolution (pixels) & Angular Res. (degrees) & Spatial Res. (Re, proj.) & FOV Radius (min-max Re) \\
-    \thead{Data Product} &
+    \thead{Data Product Name} &
+    \thead{Description} &
     \thead{Reporting Cadence \\ (minutes)} &
     \thead{Resolution \\ (voxels - rad., elev., azi.)} \\
     \midrule
-    1D H Total & 30 & (200, 1, 1) \\
-    1D Uncertainty & TBD & (200, 1, 1) \\
-    3D H Total & 30 & (200, 45, 60) \\
-    3D Uncertainty & TBD & (200, 45, 60) \\
+    FIXME & 1D H Total & 30 & (200, 1, 1) \\
+    %% 1D Uncertainty & TBD & (200, 1, 1) \\
+    FIXME & 3D H Total & 30 & (200, 45, 60) \\
+    %% 3D Uncertainty & TBD & (200, 45, 60) \\
     \botrule
   \end{tabular}
   \label{tab:data_products}
