@@ -127,10 +127,9 @@ The next section will describe the Carruthers orbit, camera geometry, physics of
 
   \st{The Geocentric Solar Ecliptic (GSE) coordinate system is a natural fit when describing spacecraft position and the exospheric hydrogen distribution, since radiation pressure is expected to impose Sun-Earth alignment on global exospheric structure.  The rest of this manuscript uses GSE in units of Earth radii (1 Re = 6371 km) either in cartesian or spherical coordinates.}
 
-  In September 2025, Carruthers was inserted into a halo orbit around the L1 Lagrange point (about 1.5 million km from Earth, 235 Re), distant enough to observe the entirety of the geocorona from an outside vantage
-  over the mission lifetime \cite{baliukin}.
+  In September 2025, Carruthers was inserted into a halo orbit around the L1 Lagrange point (about 1.5 million km from Earth, 235 Re), distant enough to observe the entirety of the geocorona from an outside vantage.
 
-  This orbit deviates above/below the ecliptic plane by $\pm$7$^\circ$ (31 Re) and $\pm$28$^\circ$ (112 Re) in the dawn/dusk direction from the Sun-Earth line, providing angular measurement diversity for tomographic analysis of the exosphere, shown in Figure \ref{fig:orbit_details}.
+  This orbit deviates above/below the ecliptic plane by $\pm$7$^\circ$ (31 Re) and $\pm$28$^\circ$ (112 Re) in the dawn/dusk direction from the Sun-Earth line, providing necessary angular measurement diversity for tomographic analysis of the exosphere, shown in Figure \ref{fig:orbit_details}.
 
 Carruthers is equipped with two co-aligned UV cameras and observes global exospheric emission at Lyman-$\alpha$ from a distant vantage, providing constraints on the global distribution of hydrogen.
 The Narrow Field Imager (NFI) observes the inner exosphere at high resolution on a 30 minute cadence and the Wide Field Imager (WFI) observes global distribution of exospheric hydrogen on a 60 minute cadence.
@@ -140,7 +139,7 @@ The Narrow Field Imager (NFI) observes the inner exosphere at high resolution on
     \centering
     %% \setlength{\tabcolsep}{4pt} % Default value: 6pt
     \caption{Camera geometry specifications. Spatial resolution is projected onto Earth tangent plane as in Figure \ref{fig:fov}.  Vantage-dependent specifications computed at orbit perigee/apogee of 190/265 Re}%
-    \begin{tabular}{@{}cccccc@{}}
+    \begin{tabular}{@{}ccccccc@{}}
       \toprule
       %% Camera & FOV (degrees) & Resolution (pixels) & Angular Res. (degrees) & Spatial Res. (Re, proj.) & FOV Radius (min-max Re) \\
       \thead{Camera} &
@@ -148,10 +147,11 @@ The Narrow Field Imager (NFI) observes the inner exosphere at high resolution on
       \thead{Resolution \\ (pixels)} &
       \thead{Angular Res. \\ (degrees)} &
       \thead{Spatial Res. \\ (Re, proj.)} &
-      \thead{FOV Radius \\ (min-max Re)} \\
+      \thead{FOV Radius \\ (min-max Re)} &
+      \thead{Cadence \\ (minutes)} \\
       \midrule
-          WFI & 18$^\circ$ & 512$^2$ & $35*10^{-3}$ & 0.12 - 0.16 & 6.0 - 8.3 \\
-          NFI & 3.6$^\circ$ & 1024$^2$ & $3.5*10^{-3}$ & 0.059 - 0.081 & 30 - 42 \\
+          WFI & 18$^\circ$ & 512$^2$ & $35*10^{-3}$ & 0.12 - 0.16 & 6.0 - 8.3 & 60 \\
+          NFI & 3.6$^\circ$ & 1024$^2$ & $3.5*10^{-3}$ & 0.059 - 0.081 & 30 - 42 & 30 \\
       \botrule
     \end{tabular}
     \label{tab:camera_specs}
@@ -182,7 +182,7 @@ In order to recover a hydrogen density distribution from measurements, it is nec
 This is known as an emission model and is a central component of tomographic retrieval algorithms.
 
   \st{Numerically modeling the physics of radiative transfer is a computationally complex task, as solar Lyman-$\alpha$ photons entering the atmosphere usually scatter multiple times, creating nonlinear interdependencies between distant portions of the exosphere.  However,} In regions of the atmosphere where hydrogen is sparse (known as the optically thin regime) it is a valid approximation that incident solar photons resonantly scatter only once \cite{ostgaard}, simplifying computational requirements and implementation complexity of the emission model.
-  Anderson and Hord Jr. \cite{opticaldepththin} define the optically thin regime as starting when $\tau <= 0.1$, where optical depth $\tau$ is a measure of the proportion of photons scattering only once.
+  Anderson and Hord Jr. \cite{opticaldepththin} define the optically thin regime as regions where optical depth $\tau <= 0.1$.
 
   With these assumptions, the measurement by the spacecraft is proportional to a line integral of the total mass of hydrogen present in the atmosphere along the LOS of a particular pixel, given by photon radiance
 
@@ -244,11 +244,11 @@ A tenuous distribution of hydrogen throughout the solar system, known as interpl
 
 Raw sensor measurements (digital number, DN) must be calibrated to column densities (atoms/cm$^2$) before they can be ingested by the retrieval algorithm.
 
-This calibration process involves the removal of various instrument effects and background signals, such as detector dark current, solar energetic particles, microchannel plate flat fielding, optical distortion, interplanetary hydrogen background, and detector voltage bias (cite Alex 1, 2).  Next, the calibration procedure divides out total instrument sensitivity to obtain radiance which is periodically calibrated against known stellar spectra to account for sensitivity drift over time (cite Alex 3).
+This calibration process involves the removal of various instrument effects and background signals, such as detector dark current, solar energetic particles, microchannel plate flat fielding, optical distortion, interplanetary hydrogen background, and detector voltage bias (FIXME: cite Alex 1, 2).  Next, the calibration procedure divides out total instrument sensitivity to obtain radiance with detectors periodically calibrated against known stellar spectra to account for sensitivity drift over time (FIXME: cite Alex 3).
+The procedure is summarized in Figure \ref{fig:procedure}. Further details of the calibration process can be found in the manuscripts cited above.
 
-Finally, the leading g factor and scattering phase function from the emission model in Equation \ref{eqn:emission_model} are removed resulting in column density that is independent of any instrument parameters or solar conditions.
+Finally, the leading g factor and scattering phase function from the emission model in Equation \ref{eqn:emission_model} are removed resulting in column density that is independent of any instrument parameters or solar conditions
 
-The procedure is summarized in Figure \ref{fig:procedure}.
 
 \begin{figure}
 
@@ -296,7 +296,6 @@ The procedure is summarized in Figure \ref{fig:procedure}.
   \label{fig:procedure}
 \end{figure}
 
-  Further details of the calibration process can be found in the manuscripts cited above.
 
 
     \begin{equation}
@@ -345,7 +344,7 @@ The procedure is summarized in Figure \ref{fig:procedure}.
   The final step of post-processing is to bin the native 512$^2$ pixel WFI and 1024$^2$ pixel NFI images to a lower resolution.
   The dense LOS spatial sampling and fast temporal cadence of these cameras creates significant memory and computational requirements for the retrieval algorithm, which can be avoided by downsampling images in a way that preserves as much detail as possible.
 
-  Carruthers utilizes a polar-binning scheme (referred to as science pixel binning) with (100, 50) radius/azimuth polar pixels for both WFI and NFI cameras, as shown in Figure \ref{fig:earth_fov_science}.
+  Carruthers utilizes a polar-binning scheme (referred to as science pixel binning) with (100, 50) radius/azimuth polar pixels for both WFI and NFI cameras (shown in Figure \ref{fig:earth_fov_science}), that is well-suited for retrievals due to the roughly spherically-symmetric distribution of the exosphere.
   \st{This downsampling is similar to the stacking and binning described in (FIXME: cite Alex paper), but occurs after downlink.  A polar binning scheme is well-suited for retrievals due to the roughly spherically-symmetric distribution of the exosphere.  Within the Carruthers mission, this is referred to as science pixel binning and shown in Figure XXX (FIXME)}.
 Similarly, temporal averaging reduces the volume of data ingested by the retrieval algorithms without significant loss of information on exosphere dynamic evolution, especially during geomagnetically quiet conditions.  The corners of the detector are masked as they are blocked by the instrument's circular apertures and contain no Lyman-$\alpha$ data.  \st{These data reduction techniques improve the memory resources required during retrieval and without significant loss of information for the particular spatial and temporal binning parameters chosen.}
 
@@ -575,7 +574,7 @@ and the minimization problem is
 %%   APJ paper - mention onion peeling
 
 
-The retrieval algorithm implicitly encodes assumptions about hydrogen density distribution (smoothness, spherical harmonic structures, etc.), and verification that these assumptions hold requires testing against plausible ground truth densities.  This section overviews some of the ground truth datasets that are available for validation, their origins, spatiotemporal coverage, and preliminary retrieval results.
+The retrieval algorithm implicitly encodes assumptions about hydrogen density distribution (smoothness, spherical harmonic structure, etc.), and verification that these assumptions hold requires testing against plausible ground truth densities.  This section overviews some of the ground truth datasets that are available for validation, their origins, spatiotemporal coverage, and preliminary retrieval results.
 
     Using the parametric model described in \cite{zoennchen_new}, Zoennchen et all fit several density distributions to Lyman-$\alpha$ radiance measurements observed by TWINS from specific days in both solar minimum and maximum conditions during geomagnetic quiet conditions near Summer solstice.
     Notably, this dataset (referred to as the TWINS SPH dataset) was generated from the spherical harmonic model described in Section \ref{sec:shsr} with order L=3 and stronger assumptions about radial decay of hydrogen distribution.
@@ -585,14 +584,33 @@ The retrieval algorithm implicitly encodes assumptions about hydrogen density di
   Table \ref{tab:datasets} gives an overview of these datasets.
 
 
-  FIXME: delete - Retrieval Performance retrieval-validation
-
   The Spherical Harmonic Spline method introduced in Section \ref{sec:shsr} will be used by the Carruthers mission for retrieval of the exospheric H density distribution for both geomagnetically active and quiet conditions.  During geomagnetically quiet conditions, the exosphere evolves slowly enough that the H density distribution may be considered static over a 2 week window of evolving vantages.  This window provides sufficient measurement diversity to capture small-scale structures within the density distribution, so Carruthers will use a spherical harmonic truncation order of L=3 during these periods.  All retrievals in this section use regularizer weights $\lambda_1=10^4$ and $\lambda_2=10$.
 
   Figures \ref{fig:recon2w_twins} and \ref{fig:recon2w_vmb} give accuracy error for a single static density retrieval over a 2 week observation window with evolving vantage on the TWINS SPH and VMB datasets.  The "true" coefficients are a direct least-squares fit of the Spherical Harmonic Spline model to the dataset 3D densities without forward model or noise.
-  Notably, the retrieval error is the smallest in the transverse (YZ) plane which is especially noticeable in the VMB retrieval.  This plane is oriented roughly perpendicular to measured LOS, which intuitively should give good conditioning, and thus high-quality retrievals, to voxels in this region.  Vertical gray bars indicate the location of spline control points.
+  Notably, the retrieval error is the smallest in the transverse (YZ) plane which is especially noticeable in the VMB retrieval.  This plane is oriented roughly perpendicular to measured LOS, which intuitively should give good conditioning, and high retrieval quality to voxels in this region.  Vertical gray bars indicate the location of spline control points.
 
     Additionally, errors are larger in the low-altitude region near the midnight (-X) side of Earth, where no LOS intersect due to occlusion by the Earth and optically-thick exosphere.  Voxels in this region are constrained only by spatial smoothing in the reconstruction model.
+
+\begin{table}[h]
+  \centering
+  %% \setlength{\tabcolsep}{4pt} % Default value: 6pt
+  \caption{Reconstruction parameters}%
+  \begin{tabular}{@{}cccccc@{}}
+    \toprule
+    %% Camera & FOV (degrees) & Resolution (pixels) & Angular Res. (degrees) & Spatial Res. (Re, proj.) & FOV Radius (min-max Re) \\
+    \thead{Retrieval Parameter} &
+    \thead{Value} \\
+    \midrule
+    Simulation Grid & (500, 45, 60) \\
+    Reconstruction Grid & (200, 45, 60) \\
+    View Geometry & (100, 50) \\
+    Observation window & 14 days \\
+    Harmonic Truncation Order (L) & 3 \\
+    Harmonic Spline C. Points & 1 \\
+    \botrule
+  \end{tabular}
+  \label{tab:quiet_recon_params}
+\end{table}
 
 \begin{table*}[h]
   \centering
@@ -698,32 +716,10 @@ The retrieval algorithm implicitly encodes assumptions about hydrogen density di
 \begin{figure}[h]
   \includegraphics[width=1\linewidth]{figures/recon2w_twins_montecarlo}
   \caption{Two week reconstruction error standard deviation (percent).  50 reconstruction trials with separate noisy measurement realizations.}
-  %% \footnotetext{Earth/Moon image courtesy of https://de.wikipedia.org/wiki/Benutzer:Master_Uegly}
   \label{fig:recon2w_twins_montecarlo}
 \end{figure}
 
-\begin{table}[h]
-  \centering
-  %% \setlength{\tabcolsep}{4pt} % Default value: 6pt
-  \caption{Reconstruction parameters}%
-  \begin{tabular}{@{}cccccc@{}}
-    \toprule
-    %% Camera & FOV (degrees) & Resolution (pixels) & Angular Res. (degrees) & Spatial Res. (Re, proj.) & FOV Radius (min-max Re) \\
-    \thead{Retrieval Parameter} &
-    \thead{Value} \\
-    \midrule
-    Simulation Grid & (500, 45, 60) \\
-    Reconstruction Grid & (200, 45, 60) \\
-    View Geometry & (100, 50) \\
-    Observation window & 14 days \\
-    Harmonic Truncation Order (L) & 3 \\
-    Harmonic Spline C. Points & 1 \\
-    \botrule
-  \end{tabular}
-  \label{tab:quiet_recon_params}
-\end{table}
-
-  During geomagnetic storms, the above static assumption no longer holds and the exosphere evolves significantly over a period of hours.  In these periods, Carruthers will use an observation window of 6 hours and limit truncation order to L=0 (spherically symmetric) to reflect the fact that poor measurement diversity of this short window cannot capture significant non-radial spatial variation.  Reconstruction results for this test are shown in Figures \ref{fig:recon6h_twins} and \ref{fig:recon6h_vmb}.
+  During geomagnetic storms, the above static assumption no longer holds and the exosphere evolves significantly over a matter of hours.  In these periods, Carruthers will use an observation window of 6 hours and limit truncation order to L=0 (spherically symmetric) to reflect the fact that poor measurement diversity of this short window cannot capture significant non-radial spatial variation.  Reconstruction results for this test are shown in Figures \ref{fig:recon6h_twins} and \ref{fig:recon6h_vmb}.
 
   These results show that despite some non-spherical variation the TWINS SPH and VMB datasets are sufficiently spherically symmetric to be reconstructed with reasonable levels of error.  Notably, the reconstructed and ground truth L=0 coefficients are nearly a perfect match, which matches the expectation of a spherically symmetric retrieval model having good conditioning from nearly any vantage.
 
@@ -733,7 +729,7 @@ The retrieval algorithm implicitly encodes assumptions about hydrogen density di
 
 \section{Conclusion}
 
-The Carruthers Geocorona Observatory is the first NASA mission dedicated to study of the nature of Earth's exosphere.  By making long cadence observations from a distant vantage, the Carruthers mission will produce exospheric H density measurements with a spatiotemporal resolution that exceeds previous studies.  This paper describes an emission model and tomographic retrieval framework for obtaining 3D exospheric reconstructions in the optically-thin regime which are appropriate for both geomagnetically quiet and active conditions.  We introduce a new atmospheric model SHSP which utilizes spherical harmonics and splines to describe an exospheric H distribution with few parameters in a way that is both general and interpretable.  We showed that reconstructions from this model meet mission requirements when evaluated against realistic ground truths with realistic view geometry and measurement noise.
+The Carruthers Geocorona Observatory is the first NASA mission dedicated to study of the nature of Earth's exosphere.  By making long cadence observations from a distant vantage, the Carruthers mission will produce exospheric H density measurements with a spatiotemporal resolution that exceeds previous studies.  This paper describes an emission model and tomographic retrieval framework for obtaining 3D exospheric reconstructions in the optically-thin regime which are appropriate for both geomagnetically quiet and active conditions.  We introduce a new atmospheric model SHSP which utilizes spherical harmonics and splines to describe an exospheric H distribution with few parameters in a way that is both general and interpretable.  We have released an open source tomographic projector library TomoSphero which GPU-enabled and differentiable, enabling rapid development of and experimentation with new optically thin atmospheric models. Finally, we showed that reconstructions from this model meet mission requirements when evaluated against realistic ground truths with realistic view geometry and measurement noise.
 
 \begin{table*}[h]
   \centering
