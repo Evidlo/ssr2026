@@ -79,21 +79,18 @@ In this work, we present a flexible 3D parametric retrieval model which improves
 
 \section{Introduction}\label{intro}
 
-The Carruthers Geocorona Observatory is NASA's first mission dedicated to investigating the fundamental nature of Earth's exosphere. 
-The Carruthers mission is designed to provide novel measurements of exospheric Hydrogen (H) from an ideal vantage with a spatial resolution and temporal cadence unmatched by any previous study.
-From its halo orbit around the Earth-Sun L1 Lagrange point, Carruthers will have an unobstructed Earth-nadir view and full control over its pointing, enabling nearly continuous, high cadence imaging of exospheric H emission.
-The target observable of the Carruthers mission is the bright Ultraviolet (UV) Lyman-$\alpha$ emission, only observable by spacecraft.
+The Carruthers Geocorona Observatory is NASA's first mission dedicated to investigating the fundamental nature of Earth's exosphere. The Carruthers mission is designed to provide novel measurements of exospheric Hydrogen (H) emission at 121.6 nm (Lyman-alpha, Ly-$\alpha$) from an ideal vantage with a spatial resolution and temporal cadence unmatched by any previous platform.  From its halo orbit around the Earth-Sun L1 Lagrange point, Carruthers will have an unobstructed Earth-nadir view and full control over its pointing, enabling nearly continuous, high cadence imaging of exospheric H emission as well as off-nadir imaging in support of image calibration. 
 
-Knowledge of the structure of the Earth's exosphere, the outermost layer of atmosphere, is critical for understanding several important atmospheric processes like plasmaspheric refilling and ring current recovery following geomagnetic storms (FIXME: cite).  Additionally, the exosphere serves as the pathway for permanent escape to space of atomic hydrogen (H), the main constituent of the exosphere and a key driver of long-term water loss on Earth.
+Knowledge of the structure of the Earth's exosphere, the outermost layer of atmosphere, is critical for understanding several important atmospheric processes, including energy dissipation and plasma transport following geomagnetic storms \cite{ilie2013} \cite{liu2022}. Additionally, the exosphere serves as the pathway for permanent escape to space of H atoms, the dominant constituent of the exosphere and a key driver of long-term surface water loss on Earth.
 
 \begin{figure*}[t!]
   \centering
   \includegraphics[height=2.9in]{figures/previous_missions}
-  \caption{Past, current and future observations of exospheric hydrogen at Lyman-$\alpha$.  Carruthers is the only mission dedicated to long-term exospheric study from a distant vantage.  Not representative of actual spacecraft location}
+  \caption{Past, current and future observations of exospheric hydrogen emission at Lyman-$\alpha$.  Carruthers is the only mission dedicated to long-term exospheric sensing from a distant vantage.  Not representative of actual spacecraft locations.}
   \label{fig:previous_mission}
 \end{figure*}
 
-While direct, in-situ measurement is possible with mass spectrometers (e.g. sounding rockets), the sheer size of the exosphere makes this approach impractical.  Ground-based remote sensing has been hampered by the fact that O\textsubscript{2} at lower altitudes is opaque to UV and by limited measurement angles due to a fixed sensor platform.
+While direct, in-situ measurement is possible with mass spectrometers, the sheer size of the exosphere makes this approach impractical.  Ground-based remote sensing has been hampered by the fact that thermospheric O\textsubscript{2} is opaque to UV and by limited measurement angles due to a fixed sensor platform.
   However, attempts have been made to exploit vantage evolution of rotating Earth's surface \cite{balmer2}.
   Visible H emission (Balmer-$\alpha$ line) from resonant fluorescence has been observed on the ground for decades \cite{balmer1}, but the signal is very dim and no reliable density distributions have been derived due to limited data constraints from ground-based sensors.  To date, no reliable retrievals have been derived from these measurements.
 
@@ -104,7 +101,7 @@ While direct, in-situ measurement is possible with mass spectrometers (e.g. soun
   An early exospheric measurement came from OGO-5 in 1969 which detected H atoms out to 7 Re and proved the existence of a geotail (a Sun-Earth aligned protrusion) and Lyman-$\alpha$ background from (IPH) \cite{ogo5} \cite{baliukin}.
   This was followed by Apollo 16 in 1972 which carried a photocathode-based UV imager to the Lunar surface that serves as the basis for modern UV cameras. The Apollo 16 experiment obtained a single image, the first ever wide-field exospheric measurement \cite{apollo2} \cite{apollo}.
   Much later Galileo performed an Earth flyby during a gravity assist in 1991 towards Jupiter, capturing a single composite image which indicated an exospheric radial extent beyond that found by Apollo.
-  A few years later in 1996, the SOHO spacecraft with its SWAN hydrogen absorption cell \cite{soho_swan} launched towards Lagrange point L1.  SWAN captured full-sky Lyman-$\alpha$ images, with some high-resolution scans directed towards the Earth, finding the presence of exospheric H atoms out to 100 Re \cite{baliukin}.
+  A few years later in 1996, the SOHO spacecraft with its SWAN hydrogen absorption cell \cite{soho_swan} launched towards Lagrange point L1.  SWAN captured full-sky Lyman-$\alpha$ images, with some high-resolution scans directed towards the Earth, detecting the presence of exospheric H atoms out to 100 Re \cite{baliukin}.
   From 2000 to 2005, the IMAGE spacecraft and GEO instrument with three scanning photometers slowly scanned over different altitudes, detecting the presence of a geotail.  The spacecraft additionally found significant temporal variation in measured flux, which was not well explained by solar variation, suggesting complicated exosphere dynamics \cite{ostgaard}.
   From 2001 to 2025, the TIMED spacecraft and GUVI instrument launched and began long-term UV imaging through the limb near the exobase, finding an inverse correlation between H density at the exobase and solar activity \cite{timed_guvi2}.
   In 2015, the PROCYON spacecraft and LAICA instrument captured a single wide-field from 2350 Re, with studies reporting agreement between the retrieved H density distribution and predictions from radiation pressure theory \cite{procyon_laica}.
@@ -195,7 +192,7 @@ This is known as an emission model and is a central component of tomographic ret
 
     %% #gt([(phot/s/cm$^2$/sr)])
 
-  where $S$ is the pixel LOS, $g_t$ is solar g factor, $t$ is time, $\phi$ is the scattering phase function, $\bm{a}_t$ is albedo correction factor, $\vc{s}$ is position vector and $\bm{\rho}$ is hydrogen density, illustrated in Figure \ref{fig:emission_model_physics}.
+  where $S$ is the pixel line-of-sight (LOS), $g_t$ is solar g factor, $t$ is time, $\phi$ is the scattering phase function, $\bm{a}_t$ is albedo correction factor, $\vc{s}$ is position vector and $\bm{\rho}$ is hydrogen density, illustrated in Figure \ref{fig:emission_model_physics}.
   Table \ref{tab:emission_units} gives an overview of different measurement quantities and their units.
 
   $I_{\text{exo}_t}$ is line-integrated radiance, an integral over wavelength of the Lyman-$\alpha$ emission line whose width is due to thermal broadening.
@@ -224,7 +221,7 @@ This is known as an emission model and is a central component of tomographic ret
   \label{tab:emission_units}
 \end{table}
 
-The scattering phase function $\phi$ represents the directional distribution of resonantly-scattered photons relative to the direction of the Sun \cite{chamberlain}.
+The scattering phase function $\phi$ represents the anisotropic directional distribution of resonantly-scattered photons relative to the direction of the Sun \cite{chamberlain}.
 
 The solar g factor $g_t$ (phot/s/atom) relates hydrogen density (atoms/cm$^3$) to photon flux emitted per unit volume (phot/s/cm$^3$) \cite{gfactor}.   The quantity $g_t / 4 \pi \cdot \phi(\beta)$ describes the rate of photons being emitted into a part of the sky (1 steradian) from a unit volume of gas and is assumed to be a known, external input to the emission model.  The solar g factor is proportional to incident solar Lyman-$\alpha$ flux at line center, which is time-varying and measured on-orbit.
 
@@ -233,7 +230,7 @@ The solar g factor $g_t$ (phot/s/atom) relates hydrogen density (atoms/cm$^3$) t
 \st{(FIXME: delete this paragraph?) Zoennchen et al. \cite{zoennchen_new} have found that extending the optically thin model to include extinction along the LOS and extinction between the Sun and scattering point reduced discrepancy between tomographic retrievals and physics-based simulations.  The scope of this manuscript does not include these correction terms but may be included in a future work.}
 
 A tenuous distribution of hydrogen throughout the solar system, known as interplanetary hydrogen (IPH), also contributes to the line-integrated Lyman-$\alpha$ radiance detected by the spacecraft.
-  IPH, like solar g factor, is measured independently by Carruthers (FIXME: cite COSSMO?) and is assumed to be known.
+  IPH, like solar g factor, is measured independently by Carruthers (FIXME: cite Alex?) and is assumed to be known.
   The impact of biases introduced by IPH subtraction has been considered to make sure retrievals still meet error requirements.
     Other unwanted sources of Lyman-$\alpha$ signal which violate emission model assumptions include the Moon and stars and the optically thick exosphere, as shown in Figure \ref{fig:masks}, but these sources will be masked and not used as retrieval constraints.  Together, these radiance sources are referred to as $I_\text{bkg}$.
 
